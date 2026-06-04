@@ -5,7 +5,6 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langchain_openai import ChatOpenAI
 
-
 SYSTEM_PROMPT = """
 Ты UI testing agent.
 
@@ -24,8 +23,9 @@ async def main():
     client = MultiServerMCPClient(
         {
             "playwright": {
-                "url": "http://localhost:8931/mcp",
-                "transport": "streamable_http",
+                "transport": "stdio",
+                "command": "npx",
+                "args": ["@playwright/mcp@latest"],
             }
         }
     )
@@ -63,20 +63,22 @@ async def main():
 
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),
-            HumanMessage(content="""
-Открой https://demo.playwright.dev/todomvc
-
-Создай две задачи:
-1. Learn MCP
-2. Learn LangChain
-
-Отметь первую задачу выполненной.
-
-В конце скажи:
-- сколько всего задач
-- сколько выполненных
-- сколько активных
-"""),
+            HumanMessage(
+                content="""
+                Открой https://demo.playwright.dev/todomvc
+                
+                Создай две задачи:
+                1. Learn MCP
+                2. Learn LangChain
+                
+                Отметь первую задачу выполненной.
+                
+                В конце скажи:
+                - сколько всего задач
+                - сколько выполненных
+                - сколько активных
+                """
+            ),
         ]
 
         for step in range(1, 30):
@@ -102,19 +104,11 @@ async def main():
                 print(f"\nCALL TOOL: {tool_name}")
                 print("ARGS:", args)
 
-                if tool_name not in tools:
-                    result_text = f"ERROR: unknown tool {tool_name}"
-                else:
-                    try:
-                        result = await tools[tool_name].ainvoke(args)
-                        result_text = str(result)
-                    except Exception as e:
-                        result_text = f"TOOL ERROR: {type(e).__name__}: {e}"
-
-                if len(result_text) > 6000:
-                    result_text = result_text[:6000] + "\n... truncated ..."
-
-                print("RESULT:", result_text)
+                try:
+                    result = await tools[tool_name].ainvoke(args)
+                    result_text = str(result)
+                except Exception as e:
+                    result_text = f"TOOL ERROR: {type(e).__name__}: {e}"
 
                 messages.append(
                     ToolMessage(
@@ -122,8 +116,6 @@ async def main():
                         tool_call_id=tool_call_id,
                     )
                 )
-
-        print("\nMax steps reached")
 
 
 if __name__ == "__main__":

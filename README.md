@@ -10,15 +10,7 @@ AI-powered browser automation agent built with LangChain, MCP and Playwright.
 * Playwright MCP
 * Ollama
 * Qwen3
-
-
-## Start MCP Server
-
-```bash
-npx @playwright/mcp
-```
-
-or run your local MCP server configuration.
+* 
 
 ## Run Agent
 
