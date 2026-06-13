@@ -186,7 +186,7 @@ results и evidence.
 
 ## Задание 10.1: routers
 
-Работайте в `src/browser_agent/autonomous_graph.py`.
+Работайте в `src/browser_agent/graph.py`.
 
 Импортируйте:
 
@@ -210,7 +210,7 @@ def route_after_execution(state: AgentState) -> str:
 Сначала запустите только router-тесты:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests\test_autonomous_graph.py -k route -q
+.\.venv\Scripts\python.exe -m pytest tests\test_graph.py -k route -q
 ```
 
 ## Задание 10.2: граф
@@ -224,6 +224,28 @@ make_plan_node(model)
 make_execute_node(browser)
 pass_run
 fail_run
+```
+
+Все они теперь находятся в актуальных модулях:
+
+```python
+from langgraph.constants import END, START
+from langgraph.graph import StateGraph
+
+from browser_agent.executor import make_execute_node
+from browser_agent.models import BrowserActionType
+from browser_agent.observer import make_observe_node
+from browser_agent.planner import make_plan_node
+from browser_agent.state import AgentState
+```
+
+`initialize`, `pass_run` и `fail_run` уже определены выше в текущем
+`src/browser_agent/graph.py`, поэтому импортировать их не нужно.
+
+Сигнатура текущего builder:
+
+```python
+def build_agent_graph(model, browser):
 ```
 
 Зарегистрируйте узлы:
@@ -329,13 +351,13 @@ Router возвращает `"fail_run"`, и статус становится `
 ## Проверка
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests\test_autonomous_graph.py -q
+.\.venv\Scripts\python.exe -m pytest tests\test_graph.py -q
 ```
 
 Итог:
 
 ```text
-40 passed
+23 passed
 ```
 
 ## Что нужно понять

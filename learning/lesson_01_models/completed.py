@@ -1,8 +1,4 @@
-"""Domain contracts for the browser testing agent.
-
-Lesson 1 is archived in learning/lesson_01_models/README.md.
-Do not add LangGraph, LangChain, or Playwright code to this module.
-"""
+"""Completed domain models after lesson 1."""
 
 from enum import StrEnum
 from typing import Any
@@ -11,8 +7,6 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class TestCase(BaseModel):
-    """Input test scenario."""
-
     id: str = Field(pattern=r"^[A-Za-z0-9_-]+$")
     name: str
     start_url: str
@@ -31,11 +25,9 @@ class BrowserActionType(StrEnum):
 
 
 class BrowserAction(BaseModel):
-    """Exactly one action proposed by the planner."""
-
     action: BrowserActionType
-    target: str | None
-    value: str | None
+    target: str | None = None
+    value: str | None = None
     reason: str
 
     @model_validator(mode="after")
@@ -46,7 +38,6 @@ class BrowserAction(BaseModel):
             BrowserActionType.PRESS,
             BrowserActionType.ASSERT_TEXT,
         }
-
         requires_value = {
             BrowserActionType.FILL,
             BrowserActionType.PRESS,
@@ -54,16 +45,12 @@ class BrowserAction(BaseModel):
 
         if self.action in requires_target and self.target is None:
             raise ValueError(f"{self.action} requires target")
-
         if self.action in requires_value and self.value is None:
             raise ValueError(f"{self.action} requires value")
-
         return self
 
 
 class ActionResult(BaseModel):
-    """Deterministic result of executing an action."""
-
     success: bool
     url_before: str
     url_after: str

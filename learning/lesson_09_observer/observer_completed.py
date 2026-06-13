@@ -1,12 +1,9 @@
-"""Browser observer from lesson 9.
+"""Completed browser observer after lesson 9."""
 
-The related lesson is archived in learning/lesson_09_observer/README.md.
-"""
 from browser_agent.state import AgentState
 
 
 def observe_browser(browser) -> dict:
-    """read the current URL and page snapshot from the browser adapter."""
     snapshot = browser.snapshot()
     return {
         "current_url": browser.current_url,
@@ -15,8 +12,6 @@ def observe_browser(browser) -> dict:
 
 
 def make_observe_node(browser):
-    """return a LangGraph node that writes observation into state."""
-
     def observe(_state: AgentState) -> dict:
         return observe_browser(browser)
 

@@ -1,11 +1,11 @@
 """LLM planner from lesson 5.
 
-Implement the prompt, structured-output chain, and planner function described in
-docs/lessons/05-llm-planner.md.
+The related lesson is archived in learning/lesson_05_planner/README.md.
 """
 from langchain_core.prompts import ChatPromptTemplate
 
 from browser_agent.models import BrowserAction
+from browser_agent.state import AgentState
 
 SYSTEM_PROMPT = """
 You are a browser testing planner.
@@ -67,3 +67,17 @@ def plan_next_action(model, test_case, page_snapshot):
         "expected": test_case.expected,
         "page_snapshot": page_snapshot,
     })
+
+
+def make_plan_node(model):
+    """Create a LangGraph node that stores the next proposed action."""
+
+    def plan(state: AgentState) -> dict:
+        action = plan_next_action(
+            model=model,
+            test_case=state["test_case"],
+            page_snapshot=state["page_snapshot"],
+        )
+        return {"proposed_action": action}
+
+    return plan

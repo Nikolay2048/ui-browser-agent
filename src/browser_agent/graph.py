@@ -1,17 +1,13 @@
-"""The first deterministic LangGraph.
+"""Autonomous agent loop from lesson 10.
 
-Lesson 2: implement the nodes and graph described in
-docs/lessons/02-state-and-graph.md.
+Implement routers and graph described in
+learning/lesson_10_autonomous_loop/README.md.
 """
-from langgraph.constants import START, END
-from langgraph.graph import StateGraph
-from langgraph.graph.state import CompiledStateGraph
-
 from browser_agent.state import AgentState
 
 
 def initialize(state: AgentState) -> dict:
-    """initialize a new agent run."""
+    """Initialize one agent run."""
     return {
         "current_url": state["test_case"].start_url,
         "route": [],
@@ -20,20 +16,26 @@ def initialize(state: AgentState) -> dict:
     }
 
 
-def complete(state: AgentState) -> dict:
-    """mark the learning graph as successfully completed."""
+def pass_run(_state: AgentState) -> dict:
+    """Mark the scenario as passed."""
     return {"status": "passed"}
 
 
-def build_learning_graph() -> CompiledStateGraph:
-    """compile and return START -> initialize -> complete -> END."""
-    builder = StateGraph(AgentState)
+def fail_run(_state: AgentState) -> dict:
+    """Mark the scenario as failed."""
+    return {"status": "failed"}
 
-    builder.add_node("initialize", initialize)
-    builder.add_node("complete", complete)
 
-    builder.add_edge(START, "initialize")
-    builder.add_edge("initialize", "complete")
-    builder.add_edge("complete", END)
+def route_planned_action(state: AgentState) -> str:
+    """TODO: route finish actions to success and other actions to executor."""
+    raise NotImplementedError
 
-    return builder.compile()
+
+def route_after_execution(state: AgentState) -> str:
+    """TODO: retry observation or terminate after failure/step limit."""
+    raise NotImplementedError
+
+
+def build_agent_graph(model, browser):
+    """TODO: compile the first autonomous observe-plan-act loop."""
+    raise NotImplementedError

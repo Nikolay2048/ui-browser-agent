@@ -1,15 +1,12 @@
-"""LangGraph state contract.
+"""AgentState after adding executor result in lesson 7."""
 
-State contract shared by the current agent graph.
-"""
-from typing import TypedDict, NotRequired, Required, Literal
+from typing import Literal, NotRequired, Required, TypedDict
 
 from browser_agent.models import ActionResult, BrowserAction, TestCase
 
 
 class AgentState(TypedDict):
     test_case: Required[TestCase]
-
     current_url: NotRequired[str]
     route: NotRequired[list[ActionResult]]
     step_count: NotRequired[int]
