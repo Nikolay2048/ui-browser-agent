@@ -4,7 +4,7 @@ Lesson 2: implement AgentState as described in docs/lessons/02-state-and-graph.m
 """
 from typing import TypedDict, NotRequired, Required, Literal
 
-from browser_agent.models import ActionResult, TestCase
+from browser_agent.models import ActionResult, BrowserAction, TestCase
 
 
 class AgentState(TypedDict):
@@ -14,3 +14,5 @@ class AgentState(TypedDict):
     route: NotRequired[list[ActionResult]]
     step_count: NotRequired[int]
     status: NotRequired[Literal["running", "passed", "failed"]]
+    page_snapshot: NotRequired[str]
+    proposed_action: NotRequired[BrowserAction]

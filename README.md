@@ -28,9 +28,9 @@
 
 ## Текущий этап
 
-Первые четыре урока завершены. Откройте
-[пятый урок](docs/lessons/05-llm-planner.md) и реализуйте первый LLM-компонент
-через LangChain structured output.
+Первые пять уроков завершены. Откройте
+[шестой урок](docs/lessons/06-planner-node.md) и подключите LangChain planner
+как узел LangGraph.
 
 Проверка:
 
