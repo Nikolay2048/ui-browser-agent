@@ -4,7 +4,7 @@ Lesson 2: implement AgentState as described in docs/lessons/02-state-and-graph.m
 """
 from typing import TypedDict, NotRequired, Required, Literal
 
-from src.browser_agent.models import TestCase, ActionResult
+from browser_agent.models import ActionResult, TestCase
 
 
 class AgentState(TypedDict):

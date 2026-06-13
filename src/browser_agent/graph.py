@@ -5,11 +5,12 @@ docs/lessons/02-state-and-graph.md.
 """
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
-from src.browser_agent.state import AgentState
+from browser_agent.state import AgentState
 
 
-def initialize(state: AgentState)-> dict:
+def initialize(state: AgentState) -> dict:
     """initialize a new agent run."""
     return {
         "current_url": state["test_case"].start_url,
@@ -19,12 +20,12 @@ def initialize(state: AgentState)-> dict:
     }
 
 
-def complete(state: AgentState):
+def complete(state: AgentState) -> dict:
     """mark the learning graph as successfully completed."""
     return {"status": "passed"}
 
 
-def build_learning_graph():
+def build_learning_graph() -> CompiledStateGraph:
     """compile and return START -> initialize -> complete -> END."""
     builder = StateGraph(AgentState)
 
