@@ -34,8 +34,8 @@ class BrowserAction(BaseModel):
     """Exactly one action proposed by the planner."""
 
     action: BrowserActionType
-    target: str | None = None
-    value: str | None = None
+    target: str | None
+    value: str | None
     reason: str
 
     @model_validator(mode="after")
