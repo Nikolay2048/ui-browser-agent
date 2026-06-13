@@ -16,3 +16,4 @@ class AgentState(TypedDict):
     status: NotRequired[Literal["running", "passed", "failed"]]
     page_snapshot: NotRequired[str]
     proposed_action: NotRequired[BrowserAction]
+    last_result: NotRequired[ActionResult]

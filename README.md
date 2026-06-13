@@ -28,9 +28,9 @@
 
 ## Текущий этап
 
-Первые пять уроков завершены. Откройте
-[шестой урок](docs/lessons/06-planner-node.md) и подключите LangChain planner
-как узел LangGraph.
+Первые семь уроков завершены. Откройте
+[восьмой урок](docs/lessons/08-plan-execute-graph.md) и соберите первый
+сквозной граф `initialize → plan → execute`.
 
 Проверка:
 
