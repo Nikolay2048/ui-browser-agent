@@ -1,1 +1,0 @@
-"""Educational browser testing agent."""
