@@ -93,6 +93,6 @@ def test_execute_node_returns_partial_update() -> None:
         make_state(make_action("click", target='button "Login"'))
     )
 
-    assert list(update) == ["last_result", "step_count"]
+    assert list(update) == ["last_result", "step_count", "route"]
     assert update["last_result"].success is True
     assert update["step_count"] == 1

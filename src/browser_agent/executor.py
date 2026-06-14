@@ -5,8 +5,8 @@ The related lesson is archived in learning/lesson_07_executor/README.md.
 
 from browser_agent.models import (
     ActionResult,
-    BrowserAction,
     BrowserActionType,
+    ExecutionStep,
 )
 from browser_agent.state import AgentState
 
@@ -56,15 +56,26 @@ def execute_action(browser, action):
 
 def make_execute_node(browser):
     """return a LangGraph node that executes proposed_action."""
+
     def execute(state: AgentState) -> dict:
+        next_step_number = state["step_count"] + 1
+
         result = execute_action(
             browser=browser,
             action=state["proposed_action"],
         )
 
+        step = ExecutionStep(
+            step_number=next_step_number,
+            page_snapshot=state["page_snapshot"],
+            action=state["proposed_action"],
+            result=result,
+        )
+
         return {
             "last_result": result,
-            "step_count": state["step_count"] + 1,
+            "step_count": next_step_number,
+            "route": [*state["route"], step],
         }
 
     return execute

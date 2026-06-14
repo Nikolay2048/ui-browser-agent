@@ -26,7 +26,8 @@
 | 07 | Executor | `completed.py`, `state_snapshot.py`, `test_completed.py` |
 | 08 | Plan-execute граф | `completed.py`, `test_completed.py` |
 | 09 | Observer | `completed.py`, `observer_completed.py`, два файла тестов |
-| 10 | Автономный цикл | `starter.py`, `test_assignment.py` |
+| 10 | Автономный цикл | `starter.py`, `completed.py`, `test_assignment.py` |
+| 11 | Трасса выполнения | текущее задание в рабочем коде |
 
 ## Где писать новый код
 
@@ -39,16 +40,18 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 10 выполняется в:
+Текущее задание урока 11 выполняется в:
 
 ```text
-src/browser_agent/graph.py
+src/browser_agent/models.py
+src/browser_agent/state.py
+src/browser_agent/executor.py
 ```
 
-Его рабочие тесты находятся в:
+Основные тесты задания находятся в:
 
 ```text
-tests/test_graph.py
+tests/test_execution_trace.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

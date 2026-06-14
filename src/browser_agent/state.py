@@ -4,14 +4,14 @@ State contract shared by the current agent graph.
 """
 from typing import TypedDict, NotRequired, Required, Literal
 
-from browser_agent.models import ActionResult, BrowserAction, TestCase
+from browser_agent.models import ActionResult, BrowserAction, TestCase, ExecutionStep
 
 
 class AgentState(TypedDict):
     test_case: Required[TestCase]
 
     current_url: NotRequired[str]
-    route: NotRequired[list[ActionResult]]
+    route: NotRequired[list[ExecutionStep]]
     step_count: NotRequired[int]
     status: NotRequired[Literal["running", "passed", "failed"]]
     page_snapshot: NotRequired[str]

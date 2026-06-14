@@ -69,3 +69,12 @@ class ActionResult(BaseModel):
     url_after: str
     error: str | None = None
     screenshot_path: str | None = None
+
+
+class ExecutionStep(BaseModel):
+    """One complete observe-plan-execute record.  """
+
+    step_number: int = Field(ge=1)
+    page_snapshot: str
+    action: BrowserAction
+    result: ActionResult
