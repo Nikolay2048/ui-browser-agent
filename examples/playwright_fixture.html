@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Playwright Adapter Practice</title>
+  </head>
+  <body>
+    <main>
+      <h1>Tasks</h1>
+      <label for="task">Task</label>
+      <input id="task" type="text">
+      <button id="add" type="button">Add</button>
+      <ul id="tasks" class="todo-list"></ul>
+    </main>
+    <script>
+      const input = document.querySelector("#task");
+      const tasks = document.querySelector("#tasks");
+
+      document.querySelector("#add").addEventListener("click", () => {
+        const item = document.createElement("li");
+        item.textContent = input.value;
+        tasks.appendChild(item);
+        input.value = "";
+      });
+    </script>
+  </body>
+</html>
