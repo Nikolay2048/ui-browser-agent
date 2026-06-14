@@ -1,0 +1,24 @@
+id: tc_02
+name: "Неверный пароль — отображение ошибки"
+description: >
+  При вводе неверного пароля система должна показать сообщение об ошибке
+  и не предоставлять доступ к каталогу.
+start_url: "https://www.saucedemo.com/"
+severity: high
+tags: [авторизация, негативный, обработка-ошибок, saucedemo]
+
+steps:
+  - step: "Убедиться, что форма входа отображается"
+    expected: "Страница входа содержит поля Username, Password и кнопку Login"
+
+  - step: "Ввести 'standard_user' в поле имени пользователя и 'wrong_password_123' в поле пароля"
+    expected: "Оба поля заполнены"
+
+  - step: "Нажать кнопку Login"
+    expected: "Авторизация не прошла — страница не переходит на /inventory.html"
+
+  - step: "Проверить наличие сообщения об ошибке"
+    expected: "Красный баннер с текстом «Username and password do not match any user in this service»"
+
+  - step: "Убедиться, что URL остался на странице входа, а не перешёл на страницу товаров"
+    expected: "URL по-прежнему https://www.saucedemo.com/"

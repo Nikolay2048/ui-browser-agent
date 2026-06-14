@@ -1,0 +1,33 @@
+id: tc_04
+name: "Полный цикл оформления заказа"
+description: >
+  Сквозной сценарий покупки: вход → добавление в корзину → переход в корзину →
+  заполнение данных → просмотр заказа → подтверждение → страница успеха.
+start_url: "https://www.saucedemo.com/"
+severity: critical
+tags: [оформление-заказа, e-commerce, критический-путь, saucedemo]
+
+steps:
+  - step: "Войти как 'standard_user' с паролем 'secret_sauce'"
+    expected: "Пользователь находится на странице Products"
+
+  - step: "Добавить «Sauce Labs Bike Light» в корзину, нажав соответствующую кнопку Add to cart"
+    expected: "Счётчик корзины показывает «1», кнопка стала «Remove»"
+
+  - step: "Перейти в корзину, нажав иконку корзины"
+    expected: "Страница корзины отображает «Sauce Labs Bike Light» как единственный товар"
+
+  - step: "Нажать кнопку Checkout"
+    expected: "Открывается первый шаг оформления заказа с полями First Name, Last Name и Zip Code"
+
+  - step: "Заполнить First Name — «Ivan», Last Name — «Petrov», Zip Code — «123456»"
+    expected: "Все три поля содержат введённые значения"
+
+  - step: "Нажать кнопку Continue"
+    expected: "Открывается второй шаг — страница обзора заказа"
+
+  - step: "Убедиться, что на странице обзора заказа показан «Sauce Labs Bike Light» с итоговой ценой"
+    expected: "Отображается товар, его цена и ненулевая итоговая сумма заказа"
+
+  - step: "Нажать кнопку Finish для подтверждения заказа"
+    expected: "Страница подтверждения заказа содержит текст «Thank you for your order!»"

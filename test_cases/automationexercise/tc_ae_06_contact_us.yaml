@@ -1,0 +1,21 @@
+id: tc_ae_06
+name: "Отправка формы обратной связи"
+description: >
+  Отправка формы обратной связи с корректными данными должна показать
+  сообщение об успешной отправке. Сайт явно указывает, что эта форма предназначена для тестирования.
+start_url: "https://automationexercise.com/contact_us"
+severity: medium
+tags: [обратная-связь, формы, automationexercise]
+
+steps:
+  - step: "Убедиться, что страница Contact Us содержит заголовок «GET IN TOUCH» и форму обратной связи"
+    expected: "Страница отображает заголовок «GET IN TOUCH» с полями Name, Email, Subject, Message и кнопкой Submit"
+
+  - step: "Заполнить Name — «Ivan Petrov», Email — «ivan.petrov@test.com», Subject — «Test Automation Feedback», Message — «This is an automated test submission for the contact form.»"
+    expected: "Все четыре поля содержат введённые значения"
+
+  - step: "Нажать кнопку Submit и подтвердить любое диалоговое окно браузера, если оно появится"
+    expected: "Форма отправлена — любой нативный alert браузера закрыт"
+
+  - step: "Проверить, что на странице появилось сообщение об успешной отправке"
+    expected: "Зелёное сообщение «Success! Your details have been submitted successfully.» отображается на странице"

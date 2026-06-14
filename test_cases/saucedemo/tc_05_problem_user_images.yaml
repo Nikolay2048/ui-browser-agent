@@ -1,0 +1,22 @@
+id: tc_05
+name: "Problem User — изображения товаров некорректны"
+description: >
+  Пользователь problem_user видит неверные изображения товаров: у всех карточек
+  одна и та же картинка вместо уникального фото каждого товара.
+  Ожидается, что observer зафиксирует это как баг сайта.
+start_url: "https://www.saucedemo.com/"
+severity: high
+tags: [баг, problem-user, изображения, ui, saucedemo]
+
+steps:
+  - step: "Войти под 'problem_user' с паролем 'secret_sauce'"
+    expected: "Пользователь перенаправлен на страницу Products /inventory.html"
+
+  - step: "Убедиться, что на странице Products видно не менее 6 карточек товаров"
+    expected: "Сетка содержит 6 карточек: Sauce Labs Backpack, Bike Light, Bolt T-Shirt, Fleece Jacket, Onesie, Red T-Shirt"
+
+  - step: "Проверить изображение первого товара (Sauce Labs Backpack) и второго товара (Sauce Labs Bike Light) — они должны отличаться"
+    expected: "Каждая карточка товара содержит уникальное изображение, соответствующее именно этому продукту. Все 6 изображений разные."
+
+  - step: "Проверить изображения у товаров Sauce Labs Bolt T-Shirt и Sauce Labs Fleece Jacket — они тоже должны быть уникальными"
+    expected: "Изображения Bolt T-Shirt и Fleece Jacket отличаются друг от друга и от остальных товаров"

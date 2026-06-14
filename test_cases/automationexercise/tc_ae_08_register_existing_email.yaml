@@ -1,0 +1,20 @@
+id: tc_ae_08
+name: "Регистрация с уже зарегистрированным email"
+description: >
+  Попытка регистрации с email, на который уже создан аккаунт, должна быть заблокирована
+  с чётким сообщением об ошибке — дублирующие аккаунты не должны создаваться.
+start_url: "https://automationexercise.com/login"
+severity: high
+tags: [авторизация, регистрация, негативный, валидация, automationexercise]
+preconditions:
+  - "Аккаунт с email 'testuser_auto123@test.com' уже существует (создан в tc_ae_01)"
+
+steps:
+  - step: "Убедиться, что форма «New User Signup!» видна на странице"
+    expected: "Секция регистрации показывает поля Name и Email с кнопкой Signup"
+
+  - step: "Ввести любое имя (например, 'DuplicateUser') и уже зарегистрированный email 'testuser_auto123@test.com', затем нажать Signup"
+    expected: "Регистрация отклонена — страница не переходит к форме информации об аккаунте"
+
+  - step: "Проверить, что рядом с формой регистрации появилось сообщение об ошибке с упоминанием email"
+    expected: "Красный текст «Email Address already exist!» виден рядом с формой регистрации"

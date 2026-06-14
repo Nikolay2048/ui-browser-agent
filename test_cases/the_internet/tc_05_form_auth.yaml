@@ -1,0 +1,23 @@
+id: tc_05
+name: "Форм-аутентификация — успешный вход"
+description: >
+  Проверить вход с корректными учётными данными на тренировочном сайте The Internet.
+start_url: "https://the-internet.herokuapp.com/login"
+severity: high
+tags: [авторизация, the-internet, heroku]
+
+steps:
+  - step: "Убедиться, что страница входа отображает форму с полями Username и Password"
+    expected: "Страница содержит заголовок «Login Page», оба поля ввода и кнопку Login"
+
+  - step: "Ввести 'tomsmith' в поле Username и 'SuperSecretPassword!' в поле Password"
+    expected: "Оба поля заполнены введёнными значениями"
+
+  - step: "Нажать кнопку Login"
+    expected: "Пользователь перенаправлен в защищённую зону по адресу /secure"
+
+  - step: "Проверить, что отображается сообщение об успешном входе"
+    expected: "Зелёный баннер-уведомление содержит текст «You logged into a secure area!»"
+
+  - step: "Убедиться, что в защищённой зоне видна кнопка Logout"
+    expected: "Кнопка «Logout» отображается на странице защищённой зоны"

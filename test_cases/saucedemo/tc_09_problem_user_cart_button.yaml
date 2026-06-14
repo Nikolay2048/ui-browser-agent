@@ -1,0 +1,22 @@
+id: tc_09
+name: "Problem User — кнопка Add to Cart не меняется на Remove"
+description: >
+  Для problem_user после нажатия «Add to cart» кнопка должна измениться на «Remove»,
+  а счётчик корзины в шапке должен показать «1». У problem_user это не работает —
+  кнопка остаётся «Add to cart» и счётчик не появляется. Ожидается баг.
+start_url: "https://www.saucedemo.com/"
+severity: critical
+tags: [баг, problem-user, корзина, add-to-cart, saucedemo]
+
+steps:
+  - step: "Войти под 'problem_user' с паролем 'secret_sauce'"
+    expected: "Пользователь находится на странице Products /inventory.html"
+
+  - step: "Найти товар «Sauce Labs Backpack» на странице и нажать его кнопку «Add to cart»"
+    expected: "Кнопка товара «Sauce Labs Backpack» немедленно меняет текст с «Add to cart» на «Remove»"
+
+  - step: "Проверить счётчик корзины в правом верхнем углу шапки сайта"
+    expected: "Счётчик на иконке корзины показывает «1» — товар добавлен"
+
+  - step: "Нажать иконку корзины и перейти на страницу /cart.html"
+    expected: "Страница корзины содержит «Sauce Labs Backpack» — товар действительно попал в корзину"

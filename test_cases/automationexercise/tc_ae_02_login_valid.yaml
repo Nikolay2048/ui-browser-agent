@@ -1,0 +1,26 @@
+id: tc_ae_02
+name: "Вход с корректными учётными данными"
+description: >
+  Зарегистрированный пользователь может войти с правильным email и паролем
+  и увидеть своё имя в шапке сайта.
+start_url: "https://automationexercise.com/login"
+severity: critical
+tags: [авторизация, вход, smoke, automationexercise]
+preconditions:
+  - "Аккаунт существует: testuser_auto123@test.com / Test@1234 (создан в tc_ae_01)"
+
+steps:
+  - step: "Убедиться, что форма «Login to your account» отображается с полями Email и Password"
+    expected: "Форма входа видна с обоими полями и кнопкой Login"
+
+  - step: "Ввести email 'testuser_auto123@test.com' в поле Email Address секции Login"
+    expected: "Поле Email заполнено"
+
+  - step: "Ввести пароль 'Test@1234' в поле Password секции Login"
+    expected: "Поле Password заполнено"
+
+  - step: "Нажать кнопку Login"
+    expected: "Пользователь перенаправлен на главную страницу"
+
+  - step: "Убедиться, что в шапке отображается «Logged in as TestUser»"
+    expected: "Верхняя навигационная панель показывает текст «Logged in as TestUser»"

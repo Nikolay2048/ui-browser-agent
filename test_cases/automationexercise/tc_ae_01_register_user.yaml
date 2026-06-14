@@ -1,0 +1,27 @@
+id: tc_ae_01
+name: "Регистрация нового пользователя"
+description: >
+  Новый посетитель может создать аккаунт, пройдя двухэтапную форму регистрации,
+  и после этого автоматически входит в систему.
+start_url: "https://automationexercise.com/login"
+severity: critical
+tags: [авторизация, регистрация, smoke, automationexercise]
+
+steps:
+  - step: "Убедиться, что страница содержит секцию «New User Signup!» и секцию «Login to your account»"
+    expected: "Обе формы видны: регистрация с полями Name и Email, вход с полями Email и Password"
+
+  - step: "В секции «New User Signup!» ввести имя 'TestUser' и email 'testuser_auto123@test.com', затем нажать Signup"
+    expected: "Открывается второй шаг регистрации — страница с формой «Enter Account Information»"
+
+  - step: "Выбрать обращение «Mr», ввести пароль 'Test@1234', установить дату рождения: день 1, месяц January, год 1990"
+    expected: "Обращение, пароль и поля даты рождения заполнены"
+
+  - step: "Заполнить: First name 'Test', Last name 'User', Address '123 Main St', Country 'United States', State 'NY', City 'New York', Zipcode '10001', Mobile number '1234567890'"
+    expected: "Все поля адреса и личных данных содержат введённые значения"
+
+  - step: "Нажать кнопку «Create Account»"
+    expected: "Аккаунт создан: страница показывает заголовок «ACCOUNT CREATED!» и кнопку Continue"
+
+  - step: "Нажать кнопку Continue"
+    expected: "Пользователь перенаправлен на главную страницу, в шапке отображается «Logged in as TestUser»"

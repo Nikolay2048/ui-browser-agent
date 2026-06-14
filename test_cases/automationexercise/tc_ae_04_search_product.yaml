@@ -1,0 +1,21 @@
+id: tc_ae_04
+name: "Поиск товара и проверка результатов"
+description: >
+  Функция поиска на странице Products должна возвращать релевантные результаты
+  при запросе по названию товара.
+start_url: "https://automationexercise.com/products"
+severity: high
+tags: [поиск, товары, automationexercise]
+
+steps:
+  - step: "Убедиться, что страница Products загружена и отображает заголовок «ALL PRODUCTS»"
+    expected: "Страница содержит заголовок «ALL PRODUCTS» с сеткой товаров и полем поиска"
+
+  - step: "Ввести «Blue Top» в поле поиска и нажать кнопку Search"
+    expected: "Поиск выполнен и отображаются результаты"
+
+  - step: "Проверить наличие заголовка «SEARCHED PRODUCTS» над результатами"
+    expected: "Страница показывает заголовок «SEARCHED PRODUCTS»"
+
+  - step: "Убедиться, что в результатах есть хотя бы одна карточка товара с названием «Blue Top»"
+    expected: "Виден хотя бы один товар с «Blue Top» в названии и указанной ценой"

@@ -7,6 +7,9 @@ __pycache__/
 # C extensions
 *.so
 .idea
+/allure-results
+/screenshots
+/generated_tests
 artifacts/
 .playwright-mcp/
 .pytest_cache/
