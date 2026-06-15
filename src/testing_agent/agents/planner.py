@@ -1,24 +1,19 @@
 from __future__ import annotations
 
-import json
-import re
-
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ollama import ChatOllama
 
-from testing_agent.config import NUM_CTX, PLANNING_MODEL
+from testing_agent.config import get_planning_llm
 from testing_agent.models import ExecutionPlan, PlannedAction, TestCase
 from testing_agent.state import AgentState
 from testing_agent.tools.browser_tools import BROWSER_TOOLS
+from testing_agent.utils import extract_json
 
-# Build tool listing dynamically from tool definitions — single source of truth
 _TOOLS_LISTING = "\n".join(
     f"- {t.name}: {(t.description or '').splitlines()[0]}"
     for t in BROWSER_TOOLS
 )
 
-_SYSTEM = f"""/no_think
-You are a senior test automation engineer. Read the natural-language test case and produce
+_SYSTEM = f"""You are a senior test automation engineer. Read the natural-language test case and produce
 a precise browser automation plan.
 
 Available tools:
@@ -55,15 +50,6 @@ Rules:
 def planner_node(state: AgentState) -> dict:
     tc: TestCase = state["test_case"]
 
-    # ChatOllama with format="json" is more reliable than with_structured_output for qwen3
-    llm = ChatOllama(
-        model=PLANNING_MODEL,
-        temperature=0,
-        num_ctx=NUM_CTX,
-        num_predict=4096,
-        format="json",
-    )
-
     steps_text = "\n".join(
         f"Step {s.step_number}: {s.step}\n  Expected result: {s.expected}"
         for s in tc.steps
@@ -86,8 +72,8 @@ Test steps:
 
     plan: ExecutionPlan | None = None
     try:
-        text = llm.invoke(messages).content
-        data = _extract_json(text)
+        text = get_planning_llm().invoke(messages).content
+        data = extract_json(text)
         if data:
             plan = _build_plan(data, tc)
     except Exception as e:
@@ -108,26 +94,6 @@ Test steps:
     }
 
 
-def _extract_json(text: str) -> dict | None:
-    # Strip qwen3 thinking tags
-    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
-
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        pass
-
-    start = text.find("{")
-    end = text.rfind("}")
-    if start != -1 and end > start:
-        try:
-            return json.loads(text[start : end + 1])
-        except json.JSONDecodeError:
-            pass
-
-    return None
-
-
 def _build_plan(data: dict, tc: TestCase) -> ExecutionPlan:
     """Build ExecutionPlan from parsed JSON, tolerating minor schema mismatches.
 
@@ -137,7 +103,6 @@ def _build_plan(data: dict, tc: TestCase) -> ExecutionPlan:
     raw_actions = data.get("planned_actions", [])
     expected_steps = {s.step_number for s in tc.steps}
 
-    # Parse all actions first
     parsed: list[PlannedAction] = []
     for i, raw in enumerate(raw_actions, start=1):
         step_num = raw.get("step_number") or raw.get("step_num") or i
@@ -161,7 +126,6 @@ def _build_plan(data: dict, tc: TestCase) -> ExecutionPlan:
             )
         )
 
-    # Keep only the first planned_action per step_number
     seen: set[int] = set()
     actions: list[PlannedAction] = []
     for a in parsed:
@@ -169,8 +133,6 @@ def _build_plan(data: dict, tc: TestCase) -> ExecutionPlan:
             seen.add(a.step_number)
             actions.append(a)
 
-    # If LLM ignored step numbers and just used sequential 1..N > len(tc.steps),
-    # remap them to the actual test step numbers
     if actions and not (seen & expected_steps):
         for action, step in zip(actions, tc.steps):
             action.step_number = step.step_number

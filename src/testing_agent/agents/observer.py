@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import json
-import re
-
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from testing_agent.config import get_planning_llm
@@ -14,9 +11,9 @@ from testing_agent.models import (
     TestCase,
 )
 from testing_agent.state import AgentState
+from testing_agent.utils import extract_json
 
-_SYSTEM = """/no_think
-You are a senior QA analyst. Analyze test execution results and produce two outputs:
+_SYSTEM = """You are a senior QA analyst. Analyze test execution results and produce two outputs:
 1. Bug reports for real website defects
 2. Clarification requests for ambiguous or incomplete test case steps
 
@@ -76,6 +73,13 @@ Clarification rules — flag a step when:
 If the test case is well-written and all steps are clear, set needs_clarification to false.
 """
 
+_OBSERVER_FALLBACK: dict = {
+    "overall_status": "broken",
+    "observations": ["JSON parse error in observer"],
+    "bugs": [],
+    "clarification": {"needs_clarification": False, "items": [], "general_suggestions": []},
+}
+
 
 def observer_node(state: AgentState) -> dict:
     tc: TestCase = state["test_case"]
@@ -111,9 +115,8 @@ Return your analysis as JSON.
 """
 
     print(f"  [Observer] Analyzing {len(step_results)} step results...")
-    llm = get_planning_llm()
-    json_llm = _JsonLLM(llm)
-    analysis = _parse_json(json_llm.invoke([SystemMessage(_SYSTEM), HumanMessage(human)]))
+    text = get_planning_llm().invoke([SystemMessage(_SYSTEM), HumanMessage(human)]).content
+    analysis = extract_json(text) or _OBSERVER_FALLBACK
 
     bugs: list[BugReport] = []
     for bd in analysis.get("bugs", []):
@@ -182,37 +185,4 @@ Return your analysis as JSON.
         "overall_status": status,
         "clarification": clarification,
         "analysis_reasoning": reasoning,
-    }
-
-
-class _JsonLLM:
-    def __init__(self, llm):
-        from langchain_ollama import ChatOllama
-        self._llm = ChatOllama(
-            model=getattr(llm, "model", "qwen3.5:35b"),
-            temperature=0,
-            num_ctx=getattr(llm, "num_ctx", 8192),
-            format="json",
-        )
-
-    def invoke(self, messages):
-        return self._llm.invoke(messages).content
-
-
-def _parse_json(text: str) -> dict:
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        pass
-    match = re.search(r"\{.*\}", text, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group())
-        except json.JSONDecodeError:
-            pass
-    return {
-        "overall_status": "broken",
-        "observations": ["JSON parse error in observer"],
-        "bugs": [],
-        "clarification": {"needs_clarification": False, "items": [], "general_suggestions": []},
     }

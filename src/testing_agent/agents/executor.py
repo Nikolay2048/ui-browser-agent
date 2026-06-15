@@ -13,8 +13,7 @@ from testing_agent.tools.browser_tools import BROWSER_TOOLS
 
 _TOOL_MAP = {t.name: t for t in BROWSER_TOOLS}
 
-_SYSTEM = """/no_think
-You are a QA automation engineer operating a real browser via tools.
+_SYSTEM = """You are a QA automation engineer operating a real browser via tools.
 
 Your goal: execute ONE test step, verify the result, then call mark_step_complete.
 

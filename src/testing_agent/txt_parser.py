@@ -1,18 +1,15 @@
 from __future__ import annotations
 
-import json
-import re
 import uuid
 from pathlib import Path
 
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ollama import ChatOllama
 
-from testing_agent.config import NUM_CTX, PLANNING_MODEL
+from testing_agent.config import get_planning_llm
 from testing_agent.models import TestCase, TestStep
+from testing_agent.utils import extract_json
 
-_SYSTEM = """/no_think
-You are a QA engineer. Parse a free-form test description into a structured test case.
+_SYSTEM = """You are a QA engineer. Parse a free-form test description into a structured test case.
 
 Split the description into logical steps — each step is one user action plus what to verify.
 Infer a clear expected result for every step even if the text does not spell it out explicitly.
@@ -46,7 +43,6 @@ Rules:
 def parse_txt(path: str | Path) -> TestCase:
     text = Path(path).read_text(encoding="utf-8").strip()
 
-    # Extract explicit url: and name: directives to override LLM output afterwards
     url_override = None
     name_override = None
     for line in text.splitlines():
@@ -56,22 +52,13 @@ def parse_txt(path: str | Path) -> TestCase:
         elif low.startswith("name:"):
             name_override = line.split(":", 1)[1].strip()
 
-    # Pass the full file text to the LLM — it handles url:/name: lines fine
-    context = text
-
-    llm = ChatOllama(
-        model=PLANNING_MODEL,
-        temperature=0,
-        num_ctx=NUM_CTX,
-        num_predict=4096,
-        reasoning=False,
-    )
+    llm = get_planning_llm()
 
     print("  [TXT parser] Parsing free-form description into test case...")
     data: dict = {}
     for attempt in range(1, 4):
-        raw = llm.invoke([SystemMessage(_SYSTEM), HumanMessage(context)]).content
-        data = _parse_json(raw)
+        raw = llm.invoke([SystemMessage(_SYSTEM), HumanMessage(text)]).content
+        data = extract_json(raw)
         if data.get("steps"):
             break
         if not raw or not raw.strip():
@@ -109,18 +96,3 @@ def parse_txt(path: str | Path) -> TestCase:
         tags=data.get("tags", []),
         severity=data.get("severity", "medium"),
     )
-
-
-def _parse_json(text: str) -> dict:
-    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        pass
-    start, end = text.find("{"), text.rfind("}")
-    if start != -1 and end > start:
-        try:
-            return json.loads(text[start:end + 1])
-        except json.JSONDecodeError:
-            pass
-    return {}
