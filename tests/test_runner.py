@@ -1,13 +1,30 @@
 from langchain_core.runnables import RunnableLambda
 
-from browser_agent.models import BrowserAction, TestCase as AgentTestCase
+from browser_agent.models import (
+    BrowserAction,
+    ExpectedResultCheck,
+    JudgeVerdict,
+    TestCase as AgentTestCase,
+)
 from browser_agent.runner import run_agent
 
 
 class GoalAwareModel:
-    def with_structured_output(self, _schema):
+    def with_structured_output(self, schema):
         def respond(prompt_value):
             current_page = str(prompt_value.to_messages()[-1].content)
+            if schema is JudgeVerdict:
+                return JudgeVerdict(
+                    passed=True,
+                    checks=[
+                        ExpectedResultCheck(
+                            expected="Learn agents is visible",
+                            passed=True,
+                            evidence='Snapshot contains listitem "Learn agents".',
+                        )
+                    ],
+                    summary="The requested task is visible.",
+                )
             if 'textbox "Task"' in current_page:
                 return BrowserAction(
                     action="fill",

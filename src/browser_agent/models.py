@@ -72,9 +72,33 @@ class ActionResult(BaseModel):
 
 
 class ExecutionStep(BaseModel):
-    """One complete observe-plan-execute record.  """
+    """One complete observe-plan-execute record."""
 
     step_number: int = Field(ge=1)
     page_snapshot: str
     action: BrowserAction
     result: ActionResult
+
+
+class ExpectedResultCheck(BaseModel):
+    """Judge evidence for one expected result."""
+    expected: str = Field(min_length=1)
+    passed: bool
+    evidence: str = Field(min_length=1)
+
+
+class JudgeVerdict(BaseModel):
+    """Independent test verdict produced by the Judge."""
+
+    passed: bool
+    checks: list[ExpectedResultCheck] = Field(min_length=1)
+    summary: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_verdict(self):
+        checks_passed = all(check.passed for check in self.checks)
+
+        if self.passed != checks_passed:
+            raise ValueError("passed must be true only when every check passed")
+
+        return self

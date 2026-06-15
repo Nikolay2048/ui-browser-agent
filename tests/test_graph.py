@@ -8,6 +8,8 @@ from browser_agent.graph import (
 from browser_agent.models import (
     ActionResult,
     BrowserAction,
+    ExpectedResultCheck,
+    JudgeVerdict,
     TestCase as AgentTestCase,
 )
 
@@ -18,6 +20,18 @@ class SnapshotAwareModel:
             rendered = "\n".join(
                 str(message.content) for message in prompt_value.to_messages()
             )
+            if schema is JudgeVerdict:
+                return JudgeVerdict(
+                    passed=True,
+                    checks=[
+                        ExpectedResultCheck(
+                            expected="Reach the done page",
+                            passed=True,
+                            evidence="Goal reached is present in the snapshot.",
+                        )
+                    ],
+                    summary="The expected final state is visible.",
+                )
             if "Goal reached" in rendered:
                 return BrowserAction(
                     action="finish",
@@ -97,7 +111,7 @@ def test_route_planned_action_distinguishes_finish() -> None:
         reason="Continue",
     )
 
-    assert route_planned_action(make_state(finish)) == "pass_run"
+    assert route_planned_action(make_state(finish)) == "judge"
     assert route_planned_action(make_state(click)) == "execute"
 
 
@@ -143,6 +157,7 @@ def test_autonomous_graph_observes_until_model_finishes() -> None:
     result = graph.invoke({"test_case": case})
 
     assert result["status"] == "passed"
+    assert result["verdict"].passed is True
     assert result["step_count"] == 1
     assert result["current_url"] == "https://example.com/done"
     assert browser.calls == [

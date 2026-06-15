@@ -4,7 +4,13 @@ State contract shared by the current agent graph.
 """
 from typing import TypedDict, NotRequired, Required, Literal
 
-from browser_agent.models import ActionResult, BrowserAction, TestCase, ExecutionStep
+from browser_agent.models import (
+    ActionResult,
+    BrowserAction,
+    ExecutionStep,
+    JudgeVerdict,
+    TestCase,
+)
 
 
 class AgentState(TypedDict):
@@ -17,3 +23,4 @@ class AgentState(TypedDict):
     page_snapshot: NotRequired[str]
     proposed_action: NotRequired[BrowserAction]
     last_result: NotRequired[ActionResult]
+    verdict: NotRequired[JudgeVerdict]

@@ -7,6 +7,7 @@ from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
 from browser_agent.executor import make_execute_node
+from browser_agent.judge import make_judge_node
 from browser_agent.models import BrowserActionType
 from browser_agent.observer import make_observe_node
 from browser_agent.planner import make_plan_node
@@ -36,7 +37,7 @@ def fail_run(_state: AgentState) -> dict:
 def route_planned_action(state: AgentState) -> str:
     """Route finish actions to success and other actions to executor."""
     if state["proposed_action"].action == BrowserActionType.FINISH:
-        return "pass_run"
+        return "judge"
     return "execute"
 
 
@@ -47,14 +48,23 @@ def route_after_execution(state: AgentState) -> str:
     return "observe"
 
 
-def build_agent_graph(model, browser):
+def route_after_judge(state: AgentState) -> str:
+    if state["verdict"].passed:
+        return "pass_run"
+    return "fail_run"
+
+
+def build_agent_graph(model, browser, judge_model=None):
     """Compile the first autonomous observe-plan-act loop."""
+    judge_model = judge_model or model
+
     builder = StateGraph(AgentState)
 
     builder.add_node("initialize", initialize)
     builder.add_node("observe", make_observe_node(browser))
     builder.add_node("plan", make_plan_node(model))
     builder.add_node("execute", make_execute_node(browser))
+    builder.add_node("judge", make_judge_node(judge_model))
     builder.add_node("pass_run", pass_run)
     builder.add_node("fail_run", fail_run)
 
@@ -68,10 +78,18 @@ def build_agent_graph(model, browser):
         "plan",
         route_planned_action,
         {
-            "pass_run": "pass_run",
+            "judge": "judge",
             "execute": "execute"
 
         }
+    )
+    builder.add_conditional_edges(
+        "judge",
+        route_after_judge,
+        {
+            "pass_run": "pass_run",
+            "fail_run": "fail_run",
+        },
     )
     builder.add_conditional_edges(
         "execute",

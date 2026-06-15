@@ -30,13 +30,13 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 14: [краткосрочная память planner-а](learning/lesson_14_planner_memory/README.md).
+Урок 15: [независимый Judge](learning/lesson_15_judge/README.md).
 
 Нужно:
 
-- компактно представить историю `ExecutionStep`;
-- передать `state["route"]` в prompt;
-- сравнить поведение локальных моделей.
+- создать структурированный `JudgeVerdict`;
+- проверить каждый expected result по evidence;
+- направлять planner `finish` в Judge, а не сразу в `passed`.
 
 После прохождения тестов:
 
