@@ -29,7 +29,7 @@ class BrowserManager:
         self._playwright = sync_playwright().start()
         self._browser = self._playwright.chromium.launch(
             headless=headless,
-            slow_mo=350,
+            slow_mo=500,
         )
         self._context = self._browser.new_context(
             viewport={"width": 1280, "height": 720},

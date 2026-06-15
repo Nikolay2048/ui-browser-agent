@@ -38,7 +38,17 @@ Locator priority (use in this order):
   click: click_by_role > click_by_text > click_by_css
   type:  fill_by_label > fill_by_placeholder > fill_by_css
 
-If a locator returns NOT_FOUND: try ONE alternative strategy, then complete the step.
+FALLBACK SEQUENCE — follow exactly when a locator fails:
+  fill_by_label NOT_FOUND → immediately try fill_by_placeholder (same value, visible placeholder text)
+  fill_by_placeholder NOT_FOUND → immediately try fill_by_css with [data-qa='name'] or [name='fieldname']
+  DO NOT call get_page_context() between fallback attempts — it wastes iterations.
+  Only call get_page_context() after ALL three strategies have been tried for a field.
+
+DUPLICATE FIELDS (same placeholder in multiple forms):
+- If get_page_context() shows two inputs with the same placeholder but different [data-qa='...'],
+  [data-test='...'], or [id='...'] hints — use fill_by_css with that attribute to target the right one.
+  Example: two 'Email Address' fields → use fill_by_css('[data-qa="signup-email"]', value)
+- Always call get_page_context() first and read the hints before filling ambiguous fields.
 
 NAVIGATION BEFORE ACTION:
 - If the step description says "open product page X", "navigate to X", "go to cart", or "click Back to Products",
@@ -64,6 +74,26 @@ AFTER REMOVING AN ITEM FROM A CART / LIST:
 - verify success by: (1) checking the cart counter decreased, OR (2) navigating to
   the cart page to confirm the item is no longer listed
 - do NOT re-click Remove just because the item text is still visible on the inventory page
+
+MULTI-STEP FORMS (registration, checkout wizards):
+- After submitting a form, call get_page_context() to see where you landed
+- If the URL changed to a page with FORM FIELDS (inputs, selects, radios visible):
+    → You are on an INTERMEDIATE step. DO NOT check for success messages yet — they will
+      not appear until you fill and submit this page too.
+    → Read get_page_context() output. Fill every required field visible (radio buttons for
+      Title/Gender, password, date-of-birth selects, name, address, country, city, zip, phone).
+    → Then click the submit / "Create Account" / "Continue" button on this page.
+    → ONLY AFTER submission check for success text ("ACCOUNT CREATED!", "Welcome", etc.)
+- If URL did NOT change after submit, check alerts_messages for errors (e.g. "Email already exists").
+- DO NOT mark step complete while unfilled form fields are still visible on screen.
+
+SEARCHING FOR PRODUCTS:
+- After filling a search field, click the dedicated search button (do not rely on Enter alone)
+  Try: click_by_css('#submit_search') or click_by_role('button', name='Search')
+- After search results load, get_page_context() shows product names as content: 'Name' items
+- To open a product from results: try click_by_text('Product Name') first; if NOT_FOUND,
+  click_by_text('View Product') — on a filtered search page there is only one such link
+
 """
 
 
@@ -142,6 +172,10 @@ def executor_node(state: AgentState) -> dict:
     no_tool_retries = 0
 
     for iteration in range(MAX_STEP_ITERATIONS):
+        # Trim history to avoid context overflow: keep system + initial human + last 12 messages
+        if len(messages) > 15:
+            messages = messages[:2] + messages[-12:]
+
         response = llm_with_tools.invoke(messages)
         messages.append(response)
 
@@ -149,17 +183,33 @@ def executor_node(state: AgentState) -> dict:
             if step_result_data:
                 break
             no_tool_retries += 1
-            if no_tool_retries <= 2:
-                print(f"    [retry {no_tool_retries}] no tool call — nudging model")
+            if no_tool_retries <= 4:
+                raw_ctx = _run_tool({"name": "get_page_context", "args": {}})
+                # Build a compact view: only unfilled required fields + empty selects + buttons
+                try:
+                    ctx = json.loads(raw_ctx)
+                    url = ctx.get("url", "")
+                    elems = ctx.get("interactive_elements", [])
+                    todo = [
+                        e for e in elems
+                        if ("[required]" in e and "[empty]" in e)
+                        or e.startswith("button")
+                    ]
+                    if todo:
+                        compact = f"URL: {url}\nTODO fields/actions:\n" + "\n".join(todo)
+                    else:
+                        compact = f"URL: {url}\nAll required fields appear filled. Click the submit button."
+                except Exception:
+                    compact = raw_ctx[:600]
+                print(f"    [retry {no_tool_retries}] no tool call — nudging with focused context")
                 messages.append(
                     HumanMessage(
-                        "You MUST call a tool — do not respond with text only. "
-                        "Options: get_page_context() to inspect the page, "
-                        "verify_text_visible('text') to check content, "
-                        "select_option(css, value) for dropdowns, "
-                        "get_element_attribute(selector, attr) for HTML attributes, "
-                        f"navigate_to_url('{test_case.start_url}') if page is wrong, "
-                        "or mark_step_complete('broken', 'reason') if truly stuck."
+                        f"{compact}\n\n"
+                        "You stopped but the step is NOT complete.\n"
+                        "- For each TODO field: use fill_by_label or fill_by_css\n"
+                        "- For TODO select: use select_option(selector, value)\n"
+                        "- If no TODO fields remain: click the submit / 'Create Account' button\n"
+                        "Call a tool NOW."
                     )
                 )
                 continue

@@ -9,7 +9,7 @@ EXECUTION_MODEL = os.getenv("EXECUTION_MODEL", "qwen3.5:35b")
 GENERATION_MODEL = os.getenv("GENERATION_MODEL", "qwen2.5-coder:14b-instruct")
 
 NUM_CTX = int(os.getenv("NUM_CTX", "8192"))
-MAX_STEP_ITERATIONS = int(os.getenv("MAX_STEP_ITERATIONS", "20"))
+MAX_STEP_ITERATIONS = int(os.getenv("MAX_STEP_ITERATIONS", "40"))
 
 
 def get_planning_llm() -> ChatOllama:

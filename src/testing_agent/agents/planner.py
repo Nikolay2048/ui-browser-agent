@@ -39,10 +39,11 @@ Rules:
 - planned_actions count MUST equal the number of test steps in the input — one entry per step, no more
 - step_number MUST match the original test step number (1, 2, 3 ...)
 - The first planned_action (step 1) MUST use navigate_to_url as the starting tool
-- Each planned_action is an independent executor session: describe everything that session must do
-  in the description field, including navigation, fills, clicks, verifications, and mark_step_complete
+- All steps run in ONE continuous browser session — state persists: if step 1 logs in, step 2 is already logged in.
+  NEVER repeat login, navigation, or any action already done in a previous step.
+- Each planned_action description must cover ONLY what that specific step says to do — nothing more.
   DO NOT split "fill username" / "fill password" / "click login" into separate planned_actions —
-  combine them into ONE: description = "Navigate to URL, fill username=X, fill password=Y, click Login, verify redirect"
+  combine them into ONE: description = "Fill username=X, fill password=Y, click Login, verify redirect"
 - Locator priority: click_by_role > click_by_text > click_by_css; fill_by_label > fill_by_placeholder > fill_by_css
 """
 
@@ -55,16 +56,19 @@ def planner_node(state: AgentState) -> dict:
         for s in tc.steps
     )
 
-    human = f"""Create an automation plan for this test case:
+    human = f"""Create an automation plan with EXACTLY {len(tc.steps)} planned_actions — one per step, no more.
 
 ID: {tc.id}
 Name: {tc.name}
-Description: {tc.description}
 Start URL: {tc.start_url}
-Preconditions: {tc.preconditions}
 
-Test steps:
+Each planned_action must cover ALL sub-actions within its step (navigate + fill + click + verify)
+combined into ONE description. Do NOT split a step into sub-steps.
+
+Steps to cover:
 {steps_text}
+
+REQUIRED: planned_actions array must have exactly {len(tc.steps)} items (step_numbers {', '.join(str(s.step_number) for s in tc.steps)}).
 """
 
     messages = [SystemMessage(_SYSTEM), HumanMessage(human)]
@@ -85,6 +89,8 @@ Test steps:
 
     reasoning = plan.reasoning or "Planner reasoning unavailable"
     print(f"  [Planner] {len(plan.planned_actions)} actions | {reasoning}")
+    for action in plan.planned_actions:
+        print(f"    Step {action.step_number}: {action.description}")
 
     return {
         "execution_plan": plan,

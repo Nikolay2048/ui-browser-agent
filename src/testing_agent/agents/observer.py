@@ -101,18 +101,18 @@ def observer_node(state: AgentState) -> dict:
 
     human = f"""Analyze this test execution:
 
-Test Case: {tc.name} (ID: {tc.id})
-URL: {tc.start_url}
-Description: {tc.description}
-
-Original test steps (natural language):
-{original_steps}
-
-Execution results:
-{results_text}
-
-Return your analysis as JSON.
-"""
+    Test Case: {tc.name} (ID: {tc.id})
+    URL: {tc.start_url}
+    Description: {tc.description}
+    
+    Original test steps (natural language):
+    {original_steps}
+    
+    Execution results:
+    {results_text}
+    
+    Return your analysis as JSON.
+    """
 
     print(f"  [Observer] Analyzing {len(step_results)} step results...")
     text = get_planning_llm().invoke([SystemMessage(_SYSTEM), HumanMessage(human)]).content

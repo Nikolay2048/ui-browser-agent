@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 import uuid
+from collections import Counter
 from pathlib import Path
 from typing import Annotated
 
@@ -25,10 +27,11 @@ def _save_screenshot(name: str) -> str:
 
 
 def _selector_hint(el) -> str:
-    """Return the most useful CSS selector hint for an element: data-test > id > empty."""
-    dt = el.get_attribute("data-test") or ""
-    if dt:
-        return f" [data-test='{dt}']"
+    """Return the most specific CSS selector hint: data-test > data-qa > data-testid > data-cy > id."""
+    for attr in ("data-test", "data-qa", "data-testid", "data-cy"):
+        val = el.get_attribute(attr) or ""
+        if val:
+            return f" [{attr}='{val}']"
     eid = el.get_attribute("id") or ""
     if eid:
         return f" [id='{eid}']"
@@ -76,33 +79,98 @@ def get_page_context() -> str:
             "input:visible:not([type='hidden']):not([type='submit']):not([type='button']), textarea:visible"
         ).all()[:20]:
             try:
+                itype = inp.get_attribute("type") or inp.evaluate("el => el.tagName.toLowerCase()") or "text"
+                # Prefer <label for="id"> text over placeholder/name so model sees "State *" not "state"
+                lbl_text = ""
+                try:
+                    lbl_text = inp.evaluate("""el => {
+                        const id = el.id;
+                        if (id) {
+                            const lbl = document.querySelector('label[for="' + id + '"]');
+                            if (lbl) return lbl.textContent.replace(/\\s+/g,' ').trim();
+                        }
+                        const wrap = el.closest('.form-group, .form-field, .input-group');
+                        if (wrap) {
+                            const lbl = wrap.querySelector('label');
+                            if (lbl) return lbl.textContent.replace(/\\s+/g,' ').trim();
+                        }
+                        return '';
+                    }""") or ""
+                except Exception:
+                    pass
                 label = (
-                    inp.get_attribute("placeholder")
+                    lbl_text
+                    or inp.get_attribute("placeholder")
                     or inp.get_attribute("aria-label")
                     or inp.get_attribute("name")
                     or inp.get_attribute("id")
                     or ""
                 ).strip()
-                itype = inp.get_attribute("type") or inp.evaluate("el => el.tagName.toLowerCase()") or "text"
-                elements.append(f"input[{itype}]: placeholder/label='{label}'{_selector_hint(inp)}")
+                is_required = inp.get_attribute("required") is not None
+                req_str = " [required]" if is_required else ""
+                fill_state = ""
+                if itype not in ("checkbox", "radio"):
+                    try:
+                        val = inp.input_value() or ""
+                        # Don't expose password value, just show fill status
+                        fill_state = " [filled]" if val else " [empty]"
+                    except Exception:
+                        pass
+                form_ctx = ""
+                try:
+                    form_hint = inp.evaluate(
+                        "el => el.closest('form')?.getAttribute('action') "
+                        "|| el.closest('form')?.id || ''"
+                    )
+                    if form_hint:
+                        form_ctx = f" <form:{form_hint}>"
+                except Exception:
+                    pass
+                elements.append(f"input[{itype}]: label='{label}'{req_str}{fill_state}{form_ctx}{_selector_hint(inp)}")
             except Exception:
                 pass
 
         for sel in page.locator("select:visible").all()[:10]:
             try:
-                cls = (sel.get_attribute("class") or "").strip().split()[0] if sel.get_attribute("class") else ""
                 sname = sel.get_attribute("name") or sel.get_attribute("id") or ""
-                css = f"select.{cls}" if cls else (f"select[name='{sname}']" if sname else "select")
+                hint = _selector_hint(sel)
+                if hint:
+                    css = f"select{hint.lstrip()}"  # lstrip: _selector_hint adds leading space
+                elif sname:
+                    css = f"select[name='{sname}']"
+                else:
+                    css = "select"
+                is_req = sel.get_attribute("required") is not None
+                req_str = " [required]" if is_req else " [optional]"
                 current = sel.input_value()
-                elements.append(f"select[css='{css}']: current_value='{current}'")
+                elements.append(f"select: name='{sname}'{req_str} selector='{css}' current_value='{current}'")
             except Exception:
                 pass
 
-        for link in page.locator("a:visible").all()[:15]:
+        for link in page.locator("a:visible").all()[:25]:
             try:
                 text = link.inner_text().strip()
                 if text:
                     elements.append(f"link: '{text}'{_selector_hint(link)}")
+            except Exception:
+                pass
+
+        # Content items: product cards, article titles, list item labels
+        seen_content: set[str] = set()
+        for item in page.locator(
+            "article h2:visible, article h3:visible, article h4:visible, "
+            ".product-information h2:visible, .product-information h3:visible, "
+            ".productinfo p:visible, .product-overlay p:visible, "
+            ".card h2:visible, .card h3:visible, .card h4:visible, "
+            ".item h2:visible, .item h3:visible, "
+            "li[class]:visible > h4, li[class]:visible > a > h4, "
+            ".features_items .col-sm-4 h2:visible"
+        ).all()[:20]:
+            try:
+                text = item.inner_text().strip()
+                if text and text not in seen_content:
+                    seen_content.add(text)
+                    elements.append(f"content: '{text}'")
             except Exception:
                 pass
 
@@ -130,12 +198,35 @@ def get_page_context() -> str:
             except Exception:
                 pass
 
+        # Detect duplicate placeholders across inputs — warn with exact CSS selectors
+        dup_warnings: list[str] = []
+        ph_map: dict[str, list[str]] = {}
+        for el_str in elements:
+            if not el_str.startswith("input"):
+                continue
+            m_ph = re.search(r"label='([^']+)'", el_str)
+            if not m_ph:
+                continue
+            ph = m_ph.group(1)
+            m_hint = re.search(r"\[(data-[^=']+)='([^']+)']", el_str)
+            hint = f"[{m_hint.group(1)}='{m_hint.group(2)}']" if m_hint else None
+            ph_map.setdefault(ph, [])
+            if hint:
+                ph_map[ph].append(hint)
+        for ph, hints in ph_map.items():
+            if len(hints) >= 2:
+                dup_warnings.append(
+                    f"DUPLICATE PLACEHOLDER '{ph}' ({len(hints)} fields) — "
+                    f"do NOT use fill_by_placeholder, use fill_by_css instead: {', '.join(hints)}"
+                )
+
         return json.dumps(
             {
                 "url": page.url,
                 "title": page.title(),
                 "headings": headings,
                 "alerts_messages": alerts,
+                "duplicate_field_warnings": dup_warnings,
                 "interactive_elements": elements[:40],
             },
             ensure_ascii=False,

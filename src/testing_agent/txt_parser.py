@@ -31,12 +31,15 @@ Return ONLY valid JSON:
 }
 
 Rules:
-- Each step must be a single coherent action (login, add item, remove item, fill form, click button)
+- If the input has numbered items (1) 2) 3) or 1. 2. 3.), each numbered item = EXACTLY ONE step.
+  NEVER split a numbered item into sub-steps even if it contains multiple actions or "and"/"и".
+- If the input has no numbers, split on clear topic changes only (e.g. login → product → checkout).
+- Each step description must include ALL the actions from that numbered item — do not omit anything.
 - Expected result must be specific and verifiable (visible text, URL change, element state)
 - Infer start_url from context clues in the text
 - Generate a short snake_case id like tc_cart_checkout
 - PRESERVE navigation: if the input says "open product page X" or "navigate to X", the step MUST say "Open product page for X" — do NOT simplify to "click Add button"
-- Keep the exact product names (Sauce Labs Backpack, etc.) in step descriptions
+- Keep the exact product names, credentials, and data values from the input in step descriptions
 """
 
 
@@ -54,12 +57,27 @@ def parse_txt(path: str | Path) -> TestCase:
 
     llm = get_planning_llm()
 
+    # Count numbered items before calling LLM so we can enforce exact step count
+    import re as _re
+    numbered = _re.findall(r"(?m)^\s*\d+[\)\.]\s", text)
+    step_count_hint = (
+        f"\n\nCRITICAL: this input has exactly {len(numbered)} numbered items "
+        f"({', '.join(str(i+1)+'.' for i in range(len(numbered)))}). "
+        f"Your 'steps' array MUST have exactly {len(numbered)} elements — no more, no less."
+    ) if len(numbered) >= 2 else ""
+
     print("  [TXT parser] Parsing free-form description into test case...")
     data: dict = {}
     for attempt in range(1, 4):
-        raw = llm.invoke([SystemMessage(_SYSTEM), HumanMessage(text)]).content
+        raw = llm.invoke([SystemMessage(_SYSTEM), HumanMessage(text + step_count_hint)]).content
         data = extract_json(raw)
-        if data.get("steps"):
+        steps_list = data.get("steps", [])
+        # Validate step count when input has numbered items
+        if steps_list and len(numbered) >= 2 and len(steps_list) != len(numbered):
+            print(f"  [TXT parser] attempt {attempt}: got {len(steps_list)} steps, expected {len(numbered)} — retrying")
+            data = {}
+            continue
+        if steps_list:
             break
         if not raw or not raw.strip():
             print(f"  [TXT parser] attempt {attempt}: LLM returned EMPTY string (len={len(raw)})")

@@ -87,7 +87,6 @@ def get_graph():
 
 def run_test_case(test_case: TestCase) -> AgentState:
     _graph_start_time[test_case.id] = datetime.now().isoformat()
-
     initial: AgentState = {
         "test_case": test_case,
         "execution_plan": None,
