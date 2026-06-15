@@ -47,12 +47,26 @@ Use the execution history to avoid repeating actions that already succeeded.
 
 
 def format_execution_history(route: list[ExecutionStep]) -> str:
-    """Format completed steps as compact planner memory.
+    """Format completed steps as compact planner memory.    """
+    if not route:
+        return "No actions have been executed yet."
+    history = []
+    for step in route:
+        lines = [
+            f"Step {step.step_number}",
+            f"action={step.action.action}",
+            f"target={step.action.target}",
+            f"value={step.action.value}",
+            f"success={step.result.success}",
+            f"url={step.result.url_before} -> {step.result.url_after}",
+        ]
 
-    TODO lesson 14: implement the compact representation described in
-    learning/lesson_14_planner_memory/README.md.
-    """
-    return "TODO lesson 14"
+        if step.result.error is not None:
+            lines.append(f"error={step.result.error}")
+
+        history.append("\n".join(lines))
+
+    return "\n\n".join(history)
 
 
 def build_planner_prompt() -> ChatPromptTemplate:
@@ -114,8 +128,7 @@ def make_plan_node(model):
             model=model,
             test_case=state["test_case"],
             page_snapshot=state["page_snapshot"],
-            # TODO lesson 14: pass the route stored in AgentState.
-            route=[],
+            route=state["route"]
         )
         return {"proposed_action": action}
 
