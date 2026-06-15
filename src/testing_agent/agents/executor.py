@@ -39,10 +39,13 @@ Locator priority (use in this order):
   type:  fill_by_label > fill_by_placeholder > fill_by_css
 
 FALLBACK SEQUENCE — follow exactly when a locator fails:
-  fill_by_label NOT_FOUND → immediately try fill_by_placeholder (same value, visible placeholder text)
-  fill_by_placeholder NOT_FOUND → immediately try fill_by_css with [data-qa='name'] or [name='fieldname']
+  1. If you already see [data-qa='X'] or [id='X'] in the page context for a field,
+     use fill_by_css('[data-qa="X"]', value) DIRECTLY — skip fill_by_label and fill_by_placeholder.
+  2. Otherwise: fill_by_label NOT_FOUND → immediately fill_by_placeholder (same value)
+     → fill_by_placeholder NOT_FOUND → immediately fill_by_css([data-qa='X'] or [name='X'])
   DO NOT call get_page_context() between fallback attempts — it wastes iterations.
-  Only call get_page_context() after ALL three strategies have been tried for a field.
+  Only call get_page_context() after ALL strategies have been tried for a field.
+  If get_page_context() shows [data-qa='address'] for Address field, use fill_by_css('[data-qa="address"]', value).
 
 DUPLICATE FIELDS (same placeholder in multiple forms):
 - If get_page_context() shows two inputs with the same placeholder but different [data-qa='...'],
@@ -80,12 +83,26 @@ MULTI-STEP FORMS (registration, checkout wizards):
 - If the URL changed to a page with FORM FIELDS (inputs, selects, radios visible):
     → You are on an INTERMEDIATE step. DO NOT check for success messages yet — they will
       not appear until you fill and submit this page too.
-    → Read get_page_context() output. Fill every required field visible (radio buttons for
-      Title/Gender, password, date-of-birth selects, name, address, country, city, zip, phone).
+    → Read get_page_context() output. Look for every input marked [required] [empty].
+      Fill ALL of them — they may be in multiple sections (account info AND address info).
+    → Use fill_by_css('[data-qa="X"]', value) for each field that shows [data-qa='X'] in context.
     → Then click the submit / "Create Account" / "Continue" button on this page.
     → ONLY AFTER submission check for success text ("ACCOUNT CREATED!", "Welcome", etc.)
 - If URL did NOT change after submit, check alerts_messages for errors (e.g. "Email already exists").
 - DO NOT mark step complete while unfilled form fields are still visible on screen.
+
+SUBMIT BUTTON RULE (CRITICAL):
+- NEVER click a submit / "Create Account" / "Place Order" button while get_page_context()
+  shows ANY input with [required] [empty].
+- Before clicking submit: mentally scan the last get_page_context() output.
+  If you see even ONE "[required] [empty]" input → fill it FIRST, then click submit.
+- AFTER clicking any submit button: ALWAYS call get_page_context() as the VERY NEXT action.
+  Do NOT jump to verify_text_visible or mark_step_complete without calling get_page_context() first.
+  Reason: the submit might have failed silently (browser validation) and the form is still there.
+- If you called get_page_context() after submit and the URL did NOT change AND there are
+  [required] [empty] inputs → fill them immediately using fill_by_css('[data-qa="X"]', value),
+  then click submit again.
+- Only after get_page_context() shows a NEW url (e.g. /account_created) call verify_text_visible.
 
 SEARCHING FOR PRODUCTS:
 - After filling a search field, click the dedicated search button (do not rely on Enter alone)
@@ -172,9 +189,9 @@ def executor_node(state: AgentState) -> dict:
     no_tool_retries = 0
 
     for iteration in range(MAX_STEP_ITERATIONS):
-        # Trim history to avoid context overflow: keep system + initial human + last 12 messages
-        if len(messages) > 15:
-            messages = messages[:2] + messages[-12:]
+        # Trim history to avoid context overflow: keep system + initial human + last 16 messages
+        if len(messages) > 20:
+            messages = messages[:2] + messages[-16:]
 
         response = llm_with_tools.invoke(messages)
         messages.append(response)
@@ -222,6 +239,7 @@ def executor_node(state: AgentState) -> dict:
             break
 
         done = False
+        _SUBMIT_KEYWORDS = ("create account", "place order", "register", "sign up", "checkout", "confirm order")
         for tool_call in response.tool_calls:
             name = tool_call["name"]
             print(f"    -> {name}({_fmt_args(tool_call['args'])})")
@@ -250,6 +268,28 @@ def executor_node(state: AgentState) -> dict:
                     }
                 done = True
                 break
+
+            # Auto-guard: after clicking a submit-type button, check for remaining required fields
+            if name in ("click_by_text", "click_by_role", "click_by_css"):
+                args_lower = json.dumps(tool_call["args"]).lower()
+                if any(kw in args_lower for kw in _SUBMIT_KEYWORDS):
+                    raw_ctx = _run_tool({"name": "get_page_context", "args": {}})
+                    try:
+                        ctx = json.loads(raw_ctx)
+                        elems = ctx.get("interactive_elements", [])
+                        missing = [e for e in elems if "[required]" in e and "[empty]" in e]
+                        if missing:
+                            print(f"    [guard] submit clicked but {len(missing)} required fields still empty — injecting nudge")
+                            field_list = "\n".join(missing)
+                            messages.append(HumanMessage(
+                                f"WARNING: You clicked a submit button but these required fields are STILL EMPTY:\n"
+                                f"{field_list}\n\n"
+                                "The form was NOT submitted — browser rejected it.\n"
+                                "Fill ALL fields listed above using fill_by_css('[data-qa=\"X\"]', value), "
+                                "then click the submit button again."
+                            ))
+                    except Exception:
+                        pass
 
         if done:
             break
