@@ -1,9 +1,6 @@
-"""Playwright adapter used by the browser testing agent.
+"""Playwright adapter used by the browser testing agent."""
 
-Implement the TODOs from learning/lesson_12_playwright_adapter/README.md.
-Keep LangGraph and LLM logic out of this module.
-"""
-
+import re
 from pathlib import Path
 
 
@@ -17,37 +14,55 @@ class PlaywrightBrowser:
 
     @property
     def current_url(self) -> str:
-        """Return the URL currently loaded by Playwright."""
-        raise NotImplementedError
+        return self.page.url
 
     def open(self, url: str) -> None:
-        """Navigate to the test case start URL."""
-        raise NotImplementedError
+        self.page.goto(url)
 
     def _resolve_target(self, target: str):
-        """Convert the agent target language into a Playwright locator."""
-        raise NotImplementedError
+        match = re.fullmatch(
+            r'role=([A-Za-z0-9_-]+)\[name="([^"]+)"\]',
+            target,
+        )
+        if match:
+            role = match.group(1)
+            name = match.group(2)
+            return self.page.get_by_role(role, name=name, exact=True)
+
+        if target.startswith("label="):
+            return self.page.get_by_label(target.removeprefix("label="))
+
+        if target.startswith("text="):
+            return self.page.get_by_text(
+                target.removeprefix("text="),
+                exact=True,
+            )
+
+        if target.startswith("css="):
+            return self.page.locator(target.removeprefix("css="))
+
+        raise ValueError(f"Unsupported target: {target}")
 
     def snapshot(self) -> str:
-        """Return a model-friendly accessibility snapshot of the page."""
-        raise NotImplementedError
+        return self.page.locator("body").aria_snapshot()
 
     def click(self, target: str) -> None:
-        """Click the resolved target."""
-        raise NotImplementedError
+        self._resolve_target(target).click()
 
     def fill(self, target: str, value: str) -> None:
-        """Fill the resolved target."""
-        raise NotImplementedError
+        self._resolve_target(target).fill(value)
 
     def press(self, target: str, value: str) -> None:
-        """Press a key on the resolved target."""
-        raise NotImplementedError
+        self._resolve_target(target).press(value)
 
     def assert_text(self, target: str) -> None:
-        """Wait until the resolved text target is visible."""
-        raise NotImplementedError
+        self._resolve_target(target).wait_for(state="visible")
 
     def screenshot(self) -> str:
-        """Save a numbered screenshot and return its path."""
-        raise NotImplementedError
+        self.artifacts_dir.mkdir(parents=True, exist_ok=True)
+        self.screenshot_number += 1
+
+        path = self.artifacts_dir / f"step-{self.screenshot_number:03d}.png"
+        self.page.screenshot(path=str(path), full_page=True)
+
+        return str(path)
