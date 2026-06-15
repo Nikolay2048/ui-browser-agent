@@ -14,7 +14,9 @@ src/browser_agent/
 ├── planner.py
 ├── observer.py
 ├── executor.py
-└── graph.py
+├── browser.py
+├── graph.py
+└── runner.py
 ```
 
 В каждый момент развивается только один граф:
@@ -28,25 +30,19 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 10: [автономный цикл](learning/lesson_10_autonomous_loop/README.md).
+Урок 14: [краткосрочная память planner-а](learning/lesson_14_planner_memory/README.md).
 
-Нужно реализовать в `src/browser_agent/graph.py`:
+Нужно:
 
-- `route_planned_action`;
-- `route_after_execution`;
-- `build_agent_graph`.
+- компактно представить историю `ExecutionStep`;
+- передать `state["route"]` в prompt;
+- сравнить поведение локальных моделей.
 
-Целевой цикл:
+После прохождения тестов:
 
-```text
-observe → plan → execute → observe
+```powershell
+.\.venv\Scripts\python.exe scripts\run_real_agent.py
 ```
-
-Он завершается при:
-
-- действии `finish`;
-- ошибке browser action;
-- достижении `max_steps`.
 
 ## Проверка
 
@@ -63,5 +59,5 @@ observe → plan → execute → observe
 - Pydantic — контракты данных;
 - LangChain — prompt, LLM и structured output;
 - LangGraph — состояние, переходы и цикл;
-- Playwright — браузерный adapter на следующем этапе;
+- Playwright — управление настоящим браузером;
 - Ollama `qwen3.5:35b` — локальная модель.

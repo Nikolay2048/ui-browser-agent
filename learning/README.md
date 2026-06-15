@@ -27,7 +27,10 @@
 | 08 | Plan-execute граф | `completed.py`, `test_completed.py` |
 | 09 | Observer | `completed.py`, `observer_completed.py`, два файла тестов |
 | 10 | Автономный цикл | `starter.py`, `completed.py`, `test_assignment.py` |
-| 11 | Трасса выполнения | текущее задание в рабочем коде |
+| 11 | Трасса выполнения | снимки моделей, state и executor |
+| 12 | Playwright adapter | `completed.py` |
+| 13 | Реальный UI-агент | снимки planner contract и runner |
+| 14 | Память planner-а | текущее задание в planner |
 
 ## Где писать новый код
 
@@ -40,18 +43,16 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 11 выполняется в:
+Текущее задание урока 14 выполняется в:
 
 ```text
-src/browser_agent/models.py
-src/browser_agent/state.py
-src/browser_agent/executor.py
+src/browser_agent/planner.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_execution_trace.py
+tests/test_planner_memory.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

@@ -69,3 +69,22 @@ def test_planner_prompt_contains_runtime_context() -> None:
     assert "Log in as the test user" in rendered
     assert "standard_user" in rendered
     assert snapshot in rendered
+
+
+def test_planner_prompt_defines_supported_target_language() -> None:
+    model = FakeStructuredModel()
+
+    plan_next_action(
+        model=model,
+        test_case=make_case(),
+        page_snapshot='- textbox "Username"\n- button "Login"',
+    )
+
+    messages = model.received_prompt.to_messages()
+    system_prompt = str(messages[0].content)
+
+    assert 'role=button[name="Login"]' in system_prompt
+    assert "label=Username" in system_prompt
+    assert "text=Products" in system_prompt
+    assert "css=.some-selector" in system_prompt
+    assert "Only use one of these target formats" in system_prompt
