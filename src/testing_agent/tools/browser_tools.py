@@ -67,7 +67,7 @@ def get_page_context() -> str:
             except Exception:
                 pass
 
-        for inp in page.locator("input:visible:not([type='hidden']):not([type='submit']):not([type='button']), textarea:visible, select:visible").all()[:20]:
+        for inp in page.locator("input:visible:not([type='hidden']):not([type='submit']):not([type='button']), textarea:visible").all()[:20]:
             try:
                 label = (
                     inp.get_attribute("placeholder")
@@ -78,6 +78,17 @@ def get_page_context() -> str:
                 ).strip()
                 itype = inp.get_attribute("type") or inp.evaluate("el => el.tagName.toLowerCase()") or "text"
                 elements.append(f"input[{itype}]: placeholder/label='{label}'")
+            except Exception:
+                pass
+
+        # Select elements — show CSS selector and current value so executor can use select_option()
+        for sel in page.locator("select:visible").all()[:10]:
+            try:
+                cls = (sel.get_attribute("class") or "").strip().split()[0] if sel.get_attribute("class") else ""
+                name = sel.get_attribute("name") or sel.get_attribute("id") or ""
+                css = f"select.{cls}" if cls else (f"select[name='{name}']" if name else "select")
+                current = sel.input_value()
+                elements.append(f"select[css='{css}']: current_value='{current}'")
             except Exception:
                 pass
 
@@ -298,6 +309,22 @@ def scroll_page(direction: str = "down") -> str:
 
 
 @tool
+def get_element_attribute(selector: str, attribute: str) -> str:
+    """Get the value of an HTML attribute from an element by CSS selector.
+    Useful for checking image src, link href, input value, data-* or aria-* attributes.
+    Examples: get_element_attribute('.inventory_item img', 'src')
+              get_element_attribute('#username', 'value')"""
+    try:
+        el = _page().locator(selector).first
+        val = el.get_attribute(attribute, timeout=5000)
+        if val is None:
+            return f"ATTRIBUTE_NOT_FOUND: '{attribute}' not present on '{selector}'"
+        return f"'{selector}' [{attribute}] = '{val}'"
+    except Exception as e:
+        return f"ERROR getting attribute '{attribute}' on '{selector}': {e}"
+
+
+@tool
 def mark_step_complete(status: str, actual_result: str, screenshot_name: str = "") -> str:
     """Mark the current test step as complete. MUST be called at the end of each step.
     status: 'passed' | 'failed' | 'broken'
@@ -333,6 +360,7 @@ BROWSER_TOOLS = [
     verify_text_visible,
     verify_element_visible,
     get_element_text,
+    get_element_attribute,
     select_option,
     scroll_page,
     mark_step_complete,

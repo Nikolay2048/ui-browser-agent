@@ -23,7 +23,7 @@ You are a senior QA analyst. Analyze test execution results and produce two outp
 Return ONLY valid JSON (no markdown):
 {
   "overall_status": "passed|failed|broken",
-  "reasoning": "Твои рассуждения: объясни почему ты пришёл к такому выводу, что именно указывает на баги или их отсутствие, как ты интерпретировал расхождения между ожидаемым и фактическим результатом",
+  "reasoning": "Explain your conclusion: what indicates bugs or their absence, how you interpreted discrepancies between expected and actual results",
   "observations": ["..."],
   "bugs": [
     {
@@ -60,10 +60,11 @@ Status rules:
 
 Bug rules — only report bugs for REAL website defects:
 - Wrong error message text
-- Missing UI element that should be there
+- Missing UI element that should be present
 - Redirect goes to wrong page
 - Form submits with invalid data
 - Functionality described in expected result does not work
+- UI element does not change state as expected after user action
 DO NOT report bugs for: agent tool errors, LLM issues, slow network, ambiguous steps.
 
 Clarification rules — flag a step when:
@@ -85,7 +86,7 @@ def observer_node(state: AgentState) -> dict:
         f"  Expected : {r.expected_result}\n"
         f"  Actual   : {r.actual_result}\n"
         f"  Error    : {r.error_message or 'none'}\n"
-        f"  Tools    : {', '.join(r.tool_calls[:5]) or 'none'}"
+        f"  Tools    : {', '.join(r.tool_calls) or 'none'}"
         for r in step_results
     )
 
@@ -109,6 +110,7 @@ Execution results:
 Return your analysis as JSON.
 """
 
+    print(f"  [Observer] Analyzing {len(step_results)} step results...")
     llm = get_planning_llm()
     json_llm = _JsonLLM(llm)
     analysis = _parse_json(json_llm.invoke([SystemMessage(_SYSTEM), HumanMessage(human)]))
@@ -138,19 +140,38 @@ Return your analysis as JSON.
         )
 
     raw_clarification = analysis.get("clarification", {})
+    clarification_items = []
+    for item in raw_clarification.get("items", []):
+        if item.get("step_number") is None:
+            item["step_number"] = 0
+        try:
+            clarification_items.append(ClarificationItem(**item))
+        except Exception:
+            pass
     clarification = ClarificationRequest(
         needs_clarification=raw_clarification.get("needs_clarification", False),
-        items=[
-            ClarificationItem(**item)
-            for item in raw_clarification.get("items", [])
-        ],
+        items=clarification_items,
         general_suggestions=raw_clarification.get("general_suggestions", []),
     )
 
-    status = analysis.get("overall_status", "broken")
-    reasoning = analysis.get("reasoning", "Рассуждение аналитика недоступно")
+    # Deterministic status override — LLM suggestion is advisory, step facts win
+    llm_status = analysis.get("overall_status", "broken")
+    any_broken = any(r.status == "broken" for r in step_results)
+    any_failed = any(r.status == "failed" for r in step_results)
+    all_passed = all(r.status == "passed" for r in step_results)
+
+    if all_passed and not bugs:
+        status = "passed"
+    elif any_broken:
+        status = "broken"
+    elif any_failed:
+        status = "failed"
+    else:
+        status = llm_status
+
+    reasoning = analysis.get("reasoning", "Observer reasoning unavailable")
     needs = clarification.needs_clarification
-    print(f"  [Observer] {reasoning[:120]}...")
+    print(f"  [Observer] {reasoning}")
     print(
         f"  Observer: {status.upper()} | {len(bugs)} bug(s) | "
         f"clarification={'needed' if needs else 'not needed'}"

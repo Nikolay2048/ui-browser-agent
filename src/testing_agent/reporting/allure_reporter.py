@@ -64,13 +64,13 @@ def write_allure_result(
                 "name": f"Step {sr.step_number}: {sr.description}",
                 "status": sr.status,
                 "statusDetails": {
-                    "message": sr.actual_result[:500],
+                    "message": sr.actual_result,
                     "trace": sr.error_message or "",
                 },
                 "attachments": attachments,
                 "parameters": [
-                    {"name": "expected", "value": sr.expected_result[:300]},
-                    {"name": "actual", "value": sr.actual_result[:300]},
+                    {"name": "expected", "value": sr.expected_result},
+                    {"name": "actual", "value": sr.actual_result},
                     {"name": "duration_ms", "value": str(sr.duration_ms)},
                 ],
                 "start": start_ts,
@@ -99,20 +99,20 @@ def write_allure_result(
         r_uuid = str(uuid.uuid4())
         r_name = f"{r_uuid}-attachment.md"
         (ALLURE_RESULTS / r_name).write_text(
-            f"# Рассуждения планировщика\n\n{plan_reasoning}", encoding="utf-8"
+            f"# Planner Reasoning\n\n{plan_reasoning}", encoding="utf-8"
         )
         top_attachments.append(
-            {"name": "Рассуждения планировщика", "source": r_name, "type": "text/markdown"}
+            {"name": "Planner Reasoning", "source": r_name, "type": "text/markdown"}
         )
 
     if analysis_reasoning:
         a_uuid = str(uuid.uuid4())
         a_name = f"{a_uuid}-attachment.md"
         (ALLURE_RESULTS / a_name).write_text(
-            f"# Рассуждения аналитика\n\n{analysis_reasoning}", encoding="utf-8"
+            f"# Observer Reasoning\n\n{analysis_reasoning}", encoding="utf-8"
         )
         top_attachments.append(
-            {"name": "Рассуждения аналитика (Observer)", "source": a_name, "type": "text/markdown"}
+            {"name": "Observer Reasoning", "source": a_name, "type": "text/markdown"}
         )
 
     if clarification and clarification.needs_clarification:
@@ -191,7 +191,7 @@ def _write_bug_result(bug: BugReport, tc: TestCase, start_ts: int) -> None:
         "fullName": f"Bug #{bug.id}: {bug.title}",
         "status": "failed",
         "statusDetails": {
-            "message": bug.actual_result[:500],
+            "message": bug.actual_result,
             "trace": f"Expected: {bug.expected_result}\nActual: {bug.actual_result}",
         },
         "labels": [

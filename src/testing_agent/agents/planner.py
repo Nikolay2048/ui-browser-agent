@@ -18,16 +18,16 @@ _TOOLS_LISTING = "\n".join(
 )
 
 _SYSTEM = f"""/no_think
-Ты старший инженер по автоматизации тестирования. Прочитай тест-кейс на естественном языке
-и составь точный план автоматизации в браузере.
+You are a senior test automation engineer. Read the natural-language test case and produce
+a precise browser automation plan.
 
-Доступные инструменты:
+Available tools:
 {_TOOLS_LISTING}
 
-Верни ТОЛЬКО валидный JSON без каких-либо пояснений или markdown:
+Return ONLY valid JSON with no markdown or explanation:
 {{
   "test_case_id": "...",
-  "reasoning": "Объясни свою стратегию: как ты интерпретируешь каждый шаг, какие локаторы выберешь и почему",
+  "reasoning": "Explain your strategy: how you interpret each step, which locators you will use and why",
   "planned_actions": [
     {{
       "step_number": 1,
@@ -37,15 +37,18 @@ _SYSTEM = f"""/no_think
       "expected_result": "..."
     }}
   ],
-  "notes": "Дополнительные замечания"
+  "notes": "Additional remarks"
 }}
 
-Стратегия:
-- ПЕРВОЕ действие ВСЕГДА navigate_to_url со стартовым URL тест-кейса
-- Локаторы по приоритету: click_by_role > click_by_text > click_by_css; fill_by_label > fill_by_placeholder > fill_by_css
-- После смены страницы — добавляй verify_text_visible или verify_element_visible
-- После важного взаимодействия — take_screenshot
-- ПОСЛЕДНЕЕ действие каждого шага — mark_step_complete(status, actual_result, screenshot_name)
+Rules:
+- planned_actions count MUST equal the number of test steps in the input — one entry per step, no more
+- step_number MUST match the original test step number (1, 2, 3 ...)
+- The first planned_action (step 1) MUST use navigate_to_url as the starting tool
+- Each planned_action is an independent executor session: describe everything that session must do
+  in the description field, including navigation, fills, clicks, verifications, and mark_step_complete
+  DO NOT split "fill username" / "fill password" / "click login" into separate planned_actions —
+  combine them into ONE: description = "Navigate to URL, fill username=X, fill password=Y, click Login, verify redirect"
+- Locator priority: click_by_role > click_by_text > click_by_css; fill_by_label > fill_by_placeholder > fill_by_css
 """
 
 
@@ -62,23 +65,24 @@ def planner_node(state: AgentState) -> dict:
     )
 
     steps_text = "\n".join(
-        f"Шаг {s.step_number}: {s.step}\n  Ожидаемый результат: {s.expected}"
+        f"Step {s.step_number}: {s.step}\n  Expected result: {s.expected}"
         for s in tc.steps
     )
 
-    human = f"""Составь план автоматизации для тест-кейса:
+    human = f"""Create an automation plan for this test case:
 
 ID: {tc.id}
-Название: {tc.name}
-Описание: {tc.description}
-Стартовый URL: {tc.start_url}
-Предусловия: {tc.preconditions}
+Name: {tc.name}
+Description: {tc.description}
+Start URL: {tc.start_url}
+Preconditions: {tc.preconditions}
 
-Шаги тест-кейса:
+Test steps:
 {steps_text}
 """
 
     messages = [SystemMessage(_SYSTEM), HumanMessage(human)]
+    print(f"  [Planner] Generating plan for {len(tc.steps)} steps...")
 
     plan: ExecutionPlan | None = None
     try:
@@ -93,8 +97,8 @@ ID: {tc.id}
         print("  [Planner] using minimal fallback plan")
         plan = _minimal_plan(tc)
 
-    reasoning = plan.reasoning or "Рассуждение планировщика недоступно"
-    print(f"  [Planner] {len(plan.planned_actions)} actions | {reasoning[:100]}...")
+    reasoning = plan.reasoning or "Planner reasoning unavailable"
+    print(f"  [Planner] {len(plan.planned_actions)} actions | {reasoning}")
 
     return {
         "execution_plan": plan,
@@ -125,9 +129,17 @@ def _extract_json(text: str) -> dict | None:
 
 
 def _build_plan(data: dict, tc: TestCase) -> ExecutionPlan:
-    """Build ExecutionPlan from parsed JSON, tolerating minor schema mismatches."""
-    actions: list[PlannedAction] = []
-    for i, raw in enumerate(data.get("planned_actions", []), start=1):
+    """Build ExecutionPlan from parsed JSON, tolerating minor schema mismatches.
+
+    Enforces one planned_action per test step: if the LLM produced more actions than
+    test steps, only the first action for each step_number is kept.
+    """
+    raw_actions = data.get("planned_actions", [])
+    expected_steps = {s.step_number for s in tc.steps}
+
+    # Parse all actions first
+    parsed: list[PlannedAction] = []
+    for i, raw in enumerate(raw_actions, start=1):
         step_num = raw.get("step_number") or raw.get("step_num") or i
         if not isinstance(step_num, int):
             try:
@@ -139,7 +151,7 @@ def _build_plan(data: dict, tc: TestCase) -> ExecutionPlan:
         if not isinstance(tool_args, dict):
             tool_args = {}
 
-        actions.append(
+        parsed.append(
             PlannedAction(
                 step_number=step_num,
                 description=raw.get("description") or raw.get("action") or f"Step {i}",
@@ -148,6 +160,24 @@ def _build_plan(data: dict, tc: TestCase) -> ExecutionPlan:
                 expected_result=raw.get("expected_result") or raw.get("expected") or "",
             )
         )
+
+    # Keep only the first planned_action per step_number
+    seen: set[int] = set()
+    actions: list[PlannedAction] = []
+    for a in parsed:
+        if a.step_number not in seen:
+            seen.add(a.step_number)
+            actions.append(a)
+
+    # If LLM ignored step numbers and just used sequential 1..N > len(tc.steps),
+    # remap them to the actual test step numbers
+    if actions and not (seen & expected_steps):
+        for action, step in zip(actions, tc.steps):
+            action.step_number = step.step_number
+
+    if len(actions) > len(tc.steps):
+        print(f"  [Planner] trimmed {len(actions)} → {len(tc.steps)} actions (one per step)")
+        actions = actions[: len(tc.steps)]
 
     return ExecutionPlan(
         test_case_id=data.get("test_case_id") or tc.id,
@@ -162,10 +192,10 @@ def _minimal_plan(tc: TestCase) -> ExecutionPlan:
     actions = [
         PlannedAction(
             step_number=0,
-            description=f"Перейти на стартовый URL: {tc.start_url}",
+            description=f"Navigate to start URL: {tc.start_url}",
             tool_name="navigate_to_url",
             tool_args={"url": tc.start_url},
-            expected_result="Страница загружена",
+            expected_result="Page loaded",
         )
     ]
     for s in tc.steps:
@@ -180,7 +210,7 @@ def _minimal_plan(tc: TestCase) -> ExecutionPlan:
         )
     return ExecutionPlan(
         test_case_id=tc.id,
-        reasoning="Fallback: minimal plan — executor работает по описанию шагов",
+        reasoning="Fallback: minimal plan — executor works from step descriptions",
         planned_actions=actions,
         notes="Fallback plan",
     )

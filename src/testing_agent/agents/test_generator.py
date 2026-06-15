@@ -48,8 +48,8 @@ def test_generator_node(state: AgentState) -> dict:
     else:
         steps_detail = "\n".join(
             f"Step {r.step_number}: {r.description}\n"
-            f"  Tools used: {', '.join(r.tool_calls[:6])}\n"
-            f"  Actual result: {r.actual_result[:200]}"
+            f"  Tools used: {', '.join(r.tool_calls)}\n"
+            f"  Actual result: {r.actual_result}"
             for r in passed_steps
         )
 

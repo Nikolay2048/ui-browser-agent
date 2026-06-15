@@ -1,0 +1,20 @@
+url: https://www.saucedemo.com/
+name: Несколько товаров в корзине, удаление одного и оформление заказа
+
+Войти на сайт под пользователем problem_user с паролем secret_sauce.
+
+Открыть страницу товара Sauce Labs Backpack и добавить его в корзину. Счётчик корзины должен показывать 1.
+
+Открыть страницу товара Sauce Labs Bike Light и добавить его в корзину. Счётчик корзины должен показывать 2.
+
+Нажать Back to Products. Открыть страницу товара Sauce Labs Bolt T-Shirt и добавить его в корзину. Счётчик корзины должен показывать 3.
+
+Перейти в корзину. Нажать Remove рядом с товаром Sauce Labs Bike Light. Счётчик корзины должен показывать 2.
+
+В корзине должны присутствовать Sauce Labs Backpack и Sauce Labs Bolt T-Shirt (всего 2 товара). Товара Sauce Labs Bike Light быть не должно.
+
+Нажать Checkout. Заполнить форму: First Name = Ivan, Last Name = Petrov, Zip/Postal Code = 12345. Нажать Continue. Должна открыться страница Checkout: Overview.
+
+На странице Checkout: Overview убедиться что видны оба товара — Sauce Labs Backpack и Sauce Labs Bolt T-Shirt — и отображается итоговая сумма (Total).
+
+Нажать Finish и убедиться что появилось сообщение THANK YOU FOR YOUR ORDER.

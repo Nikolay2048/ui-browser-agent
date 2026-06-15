@@ -18,6 +18,7 @@ def get_planning_llm() -> ChatOllama:
         temperature=0,
         num_ctx=NUM_CTX,
         num_predict=4096,
+        reasoning=False,
     )
 
 
@@ -27,6 +28,7 @@ def get_execution_llm() -> ChatOllama:
         temperature=0,
         num_ctx=NUM_CTX,
         num_predict=2048,
+        reasoning=False,
     )
 
 
@@ -36,4 +38,5 @@ def get_generation_llm() -> ChatOllama:
         temperature=0,
         num_ctx=NUM_CTX,
         num_predict=4096,
+        reasoning=False,
     )

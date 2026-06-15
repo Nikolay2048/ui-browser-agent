@@ -13,6 +13,13 @@ After running:
 from __future__ import annotations
 
 import argparse
+import sys
+
+# Force UTF-8 output on Windows (avoids UnicodeEncodeError for non-ASCII chars)
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 import os
 import sys
 import time
@@ -35,6 +42,7 @@ else:
 from testing_agent.browser_manager import BrowserManager
 from testing_agent.graph import run_test_case
 from testing_agent.models import TestCase, TestStep
+from testing_agent.txt_parser import parse_txt
 
 
 def load_test_case(path: str | Path) -> TestCase:
@@ -75,7 +83,7 @@ def load_test_case(path: str | Path) -> TestCase:
     )
 
 
-def collect_yaml_files(paths: list[str], pattern: str = "*.yaml") -> list[Path]:
+def collect_test_files(paths: list[str], pattern: str = "*.yaml") -> list[Path]:
     files: list[Path] = []
     for p in paths:
         path = Path(p)
@@ -83,6 +91,9 @@ def collect_yaml_files(paths: list[str], pattern: str = "*.yaml") -> list[Path]:
             files.append(path)
         elif path.is_dir():
             files.extend(sorted(path.rglob(pattern)))
+            # also collect .txt test cases from directories
+            if "*.yaml" in pattern or pattern == "*.yaml":
+                files.extend(sorted(path.rglob("*.txt")))
     return files
 
 
@@ -91,8 +102,9 @@ def _divider(char: str = "=", width: int = 65) -> str:
 
 
 def run_single(yaml_path: Path, headless: bool = False) -> dict:
+    tc = parse_txt(yaml_path) if yaml_path.suffix == ".txt" else load_test_case(yaml_path)
+
     print(f"\n{_divider()}")
-    tc = load_test_case(yaml_path)
     print(f"TC: [{tc.id}] {tc.name}")
     print(f"URL: {tc.start_url}")
     print(f"Steps: {len(tc.steps)} | Severity: {tc.severity.upper()}")
@@ -168,9 +180,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    files = collect_yaml_files(args.targets, pattern=args.pattern)
+    files = collect_test_files(args.targets, pattern=args.pattern)
     if not files:
-        print(f"No YAML files found in: {args.targets}")
+        print(f"No test files found in: {args.targets}")
         sys.exit(1)
 
     print(f"\nFound {len(files)} test case(s) to run:")
