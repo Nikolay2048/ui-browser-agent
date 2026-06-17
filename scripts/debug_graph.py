@@ -10,7 +10,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from langchain_core.runnables import RunnableLambda
 
 from browser_agent.graph import build_agent_graph
-from browser_agent.models import BrowserAction, TestCase
+from browser_agent.models import BrowserAction, BrowserTarget, TestCase
 
 
 class DebugModel:
@@ -25,7 +25,11 @@ class DebugModel:
             if 'button "Continue"' in prompt_text:
                 return BrowserAction(
                     action="click",
-                    target='button "Continue"',
+                    target=BrowserTarget(
+                        strategy="role",
+                        value="button",
+                        name="Continue",
+                    ),
                     value=None,
                     reason="The visible Continue button advances the scenario.",
                 )

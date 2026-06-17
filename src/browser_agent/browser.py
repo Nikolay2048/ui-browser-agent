@@ -3,6 +3,8 @@
 import re
 from pathlib import Path
 
+from browser_agent.models import BrowserTargetStrategy, BrowserTarget
+
 
 class PlaywrightBrowser:
     """Translate agent browser operations into Playwright calls."""
@@ -19,29 +21,26 @@ class PlaywrightBrowser:
     def open(self, url: str) -> None:
         self.page.goto(url)
 
-    def _resolve_target(self, target: str):
-        match = re.fullmatch(
-            r'role=([A-Za-z0-9_-]+)\[name="([^"]+)"\]',
-            target,
-        )
-        if match:
-            role = match.group(1)
-            name = match.group(2)
-            return self.page.get_by_role(role, name=name, exact=True)
+    def _resolve_target(self, target: BrowserTarget):
+        if not isinstance(target, BrowserTarget):
+            raise TypeError("target must be BrowserTarget")
 
-        if target.startswith("label="):
-            return self.page.get_by_label(target.removeprefix("label="))
+        match target.strategy:
+            case BrowserTargetStrategy.ROLE:
+                return self.page.get_by_role(
+                    target.value,
+                    name=target.name,
+                    exact=True,
+                )
 
-        if target.startswith("text="):
-            return self.page.get_by_text(
-                target.removeprefix("text="),
-                exact=True,
-            )
+            case BrowserTargetStrategy.LABEL:
+                return self.page.get_by_label(target.value)
 
-        if target.startswith("css="):
-            return self.page.locator(target.removeprefix("css="))
+            case BrowserTargetStrategy.TEXT:
+                return self.page.get_by_text(target.value, exact=True)
 
-        raise ValueError(f"Unsupported target: {target}")
+            case BrowserTargetStrategy.CSS:
+                return self.page.locator(target.value)
 
     def snapshot(self) -> str:
         return self.page.locator("body").aria_snapshot()

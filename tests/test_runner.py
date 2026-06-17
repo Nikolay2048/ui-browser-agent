@@ -2,6 +2,7 @@ from langchain_core.runnables import RunnableLambda
 
 from browser_agent.models import (
     BrowserAction,
+    BrowserTarget,
     ExpectedResultCheck,
     JudgeVerdict,
     TestCase as AgentTestCase,
@@ -28,14 +29,14 @@ class GoalAwareModel:
             if 'textbox "Task"' in current_page:
                 return BrowserAction(
                     action="fill",
-                    target="label=Task",
+                    target=BrowserTarget(strategy="label", value="Task"),
                     value="Learn agents",
                     reason="Enter the task from test data.",
                 )
             if 'button "Add"' in current_page:
                 return BrowserAction(
                     action="click",
-                    target='role=button[name="Add"]',
+                    target=BrowserTarget(strategy="role", value="button", name="Add"),
                     value=None,
                     reason="Submit the entered task.",
                 )

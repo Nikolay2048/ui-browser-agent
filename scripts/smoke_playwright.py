@@ -9,6 +9,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from browser_agent.browser import PlaywrightBrowser
+from browser_agent.models import BrowserTarget
 
 
 def main() -> None:
@@ -31,9 +32,16 @@ def main() -> None:
         print("\nINITIAL SNAPSHOT\n")
         print(browser.snapshot())
 
-        browser.fill("label=Task", "Learn Playwright")
-        browser.click('role=button[name="Add"]')
-        browser.assert_text("text=Learn Playwright")
+        browser.fill(
+            BrowserTarget(strategy="label", value="Task"),
+            "Learn Playwright",
+        )
+        browser.click(
+            BrowserTarget(strategy="role", value="button", name="Add"),
+        )
+        browser.assert_text(
+            BrowserTarget(strategy="text", value="Learn Playwright"),
+        )
 
         print("\nFINAL SNAPSHOT\n")
         print(browser.snapshot())

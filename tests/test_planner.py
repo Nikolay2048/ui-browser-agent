@@ -1,6 +1,6 @@
 from langchain_core.runnables import RunnableLambda
 
-from browser_agent.models import BrowserAction, TestCase as AgentTestCase
+from browser_agent.models import BrowserAction, BrowserTarget, TestCase as AgentTestCase
 from browser_agent.planner import build_planner_chain, plan_next_action
 
 
@@ -16,7 +16,7 @@ class FakeStructuredModel:
             self.received_prompt = prompt_value
             return BrowserAction(
                 action="fill",
-                target="label=Username",
+                target=BrowserTarget(strategy="label", value="Username"),
                 value="standard_user",
                 reason="The login form requires a username.",
             )
@@ -54,7 +54,7 @@ def test_plan_next_action_returns_typed_action() -> None:
 
     assert isinstance(result, BrowserAction)
     assert result.action == "fill"
-    assert result.target == "label=Username"
+    assert result.target == BrowserTarget(strategy="label", value="Username")
 
 
 def test_planner_prompt_contains_runtime_context() -> None:
@@ -83,8 +83,10 @@ def test_planner_prompt_defines_supported_target_language() -> None:
     messages = model.received_prompt.to_messages()
     system_prompt = str(messages[0].content)
 
-    assert 'role=button[name="Login"]' in system_prompt
-    assert "label=Username" in system_prompt
-    assert "text=Products" in system_prompt
-    assert "css=.some-selector" in system_prompt
-    assert "Only use one of these target formats" in system_prompt
+    assert "target must be an object" in system_prompt
+    assert '"strategy": "role"' in system_prompt
+    assert '"value": "button"' in system_prompt
+    assert '"name": "Login"' in system_prompt
+    assert '"strategy": "label"' in system_prompt
+    assert '"strategy": "text"' in system_prompt
+    assert '"strategy": "css"' in system_prompt

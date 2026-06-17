@@ -17,26 +17,53 @@ Use test data from the test case when input values are required.
 Return only the next action, not a full plan.
 The action must be valid according to the BrowserAction schema.
 
-Only use one of these target formats:
-- role=button[name="Login"]
-- label=Username
-- text=Products
-- css=.some-selector
+Target must be an object.
+
+Use one of these target object formats:
+
+Role target:
+{
+  "strategy": "role",
+  "value": "button",
+  "name": "Login"
+}
+
+Label target:
+{
+  "strategy": "label",
+  "value": "Username"
+}
+
+Text target:
+{
+  "strategy": "text",
+  "value": "Products"
+}
+
+CSS target:
+{
+  "strategy": "css",
+  "value": ".some-selector"
+}
 
 The accessibility snapshot syntax is descriptive and is not a valid target.
 Never copy snapshot entries directly into target.
 
-Convert snapshot elements to target format:
-- textbox "Task" -> label=Task
-- button "Add" -> role=button[name="Add"]
-- visible text "Products" -> text=Products
+Convert snapshot elements to target objects:
+- textbox "Task" -> {"strategy": "label", "value": "Task"}
+- button "Add" -> {"strategy": "role", "value": "button", "name": "Add"}
+- visible text "Products" -> {"strategy": "text", "value": "Products"}
 
 Invalid targets include:
-- textbox="Task"
-- textbox "Task"
-- button "Add"
-- get_by_label("Task")
-- page.locator(...)
+- "label=Task"
+- "role=button[name=\\"Add\\"]"
+- "text=Products"
+- "css=.some-selector"
+- "textbox=\\"Task\\""
+- "textbox \\"Task\\""
+- "button \\"Add\\""
+- "get_by_label(\\"Task\\")"
+- "page.locator(...)"
 
 For click and assert_text, target is required.
 For fill and press, both target and value are required.

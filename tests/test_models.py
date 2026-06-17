@@ -4,6 +4,7 @@ from pydantic import ValidationError
 from browser_agent.models import (
     ActionResult,
     BrowserAction,
+    BrowserTarget,
     TestCase as AgentTestCase,
 )
 
@@ -36,10 +37,10 @@ def test_test_case_rejects_invalid_limits() -> None:
 @pytest.mark.parametrize(
     ("action", "target", "value"),
     [
-        ("click", 'role=button[name="Login"]', None),
-        ("fill", "label=Username", "standard_user"),
-        ("press", "label=Username", "Enter"),
-        ("assert_text", "text=Products", None),
+        ("click", BrowserTarget(strategy="role", value="button", name="Login"), None),
+        ("fill", BrowserTarget(strategy="label", value="Username"), "standard_user"),
+        ("press", BrowserTarget(strategy="label", value="Username"), "Enter"),
+        ("assert_text", BrowserTarget(strategy="text", value="Products"), None),
         ("finish", None, None),
     ],
 )
@@ -62,7 +63,11 @@ def test_valid_browser_actions(
     "payload",
     [
         {"action": "click", "reason": "Missing target"},
-        {"action": "fill", "target": "label=Username", "reason": "Missing value"},
+        {
+            "action": "fill",
+            "target": {"strategy": "label", "value": "Username"},
+            "reason": "Missing value",
+        },
         {"action": "unknown", "target": "body", "reason": "Unknown action"},
     ],
 )

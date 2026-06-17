@@ -3,6 +3,7 @@ from langchain_core.runnables import RunnableLambda
 from browser_agent.models import (
     ActionResult,
     BrowserAction,
+    BrowserTarget,
     ExecutionStep,
     TestCase as AgentTestCase,
 )
@@ -15,7 +16,7 @@ from browser_agent.planner import (
 def make_step(
     number: int,
     action: str,
-    target: str,
+    target: BrowserTarget,
     value: str | None,
     *,
     success: bool = True,
@@ -76,11 +77,11 @@ def test_empty_route_has_explicit_memory_message() -> None:
 
 def test_history_contains_facts_but_omits_heavy_fields() -> None:
     route = [
-        make_step(1, "fill", "label=Task", "Learn agents"),
+        make_step(1, "fill", BrowserTarget(strategy="label", value="Task"), "Learn agents"),
         make_step(
             2,
             "click",
-            'role=button[name="Add"]',
+            BrowserTarget(strategy="role", value="button", name="Add"),
             None,
             success=False,
             error="Button is blocked",
@@ -104,7 +105,7 @@ def test_history_contains_facts_but_omits_heavy_fields() -> None:
 
 def test_plan_node_passes_state_route_to_prompt() -> None:
     model = PromptCapturingModel()
-    route = [make_step(1, "fill", "label=Task", "Learn agents")]
+    route = [make_step(1, "fill", BrowserTarget(strategy="label", value="Task"), "Learn agents")]
     node = make_plan_node(model)
 
     node(

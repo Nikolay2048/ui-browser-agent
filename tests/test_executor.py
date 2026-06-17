@@ -1,5 +1,10 @@
 from browser_agent.executor import execute_action, make_execute_node
-from browser_agent.models import ActionResult, BrowserAction, TestCase as AgentTestCase
+from browser_agent.models import (
+    ActionResult,
+    BrowserAction,
+    BrowserTarget,
+    TestCase as AgentTestCase,
+)
 
 
 class FakeBrowser:
@@ -55,11 +60,15 @@ def test_execute_action_dispatches_fill() -> None:
 
     result = execute_action(
         browser,
-        make_action("fill", target="label=Username", value="standard_user"),
+        make_action(
+            "fill",
+            target=BrowserTarget(strategy="label", value="Username"),
+            value="standard_user",
+        ),
     )
 
     assert browser.calls == [
-        ("fill", "label=Username", "standard_user"),
+        ("fill", BrowserTarget(strategy="label", value="Username"), "standard_user"),
         ("screenshot",),
     ]
     assert result == ActionResult(
@@ -77,7 +86,10 @@ def test_execute_action_converts_browser_error_to_result() -> None:
 
     result = execute_action(
         FailingBrowser(),
-        make_action("click", target='button "Missing"'),
+        make_action(
+            "click",
+            target=BrowserTarget(strategy="role", value="button", name="Missing"),
+        ),
     )
 
     assert result.success is False
@@ -90,7 +102,12 @@ def test_execute_node_returns_partial_update() -> None:
     node = make_execute_node(browser)
 
     update = node(
-        make_state(make_action("click", target='button "Login"'))
+        make_state(
+            make_action(
+                "click",
+                target=BrowserTarget(strategy="role", value="button", name="Login"),
+            )
+        )
     )
 
     assert list(update) == ["last_result", "step_count", "route"]

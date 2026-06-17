@@ -30,13 +30,13 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 15: [независимый Judge](learning/lesson_15_judge/README.md).
+Урок 16: [типизированные browser targets](learning/lesson_16_typed_targets/README.md).
 
 Нужно:
 
-- создать структурированный `JudgeVerdict`;
-- проверить каждый expected result по evidence;
-- направлять planner `finish` в Judge, а не сразу в `passed`.
+- заменить строковый `target` на `BrowserTarget`;
+- обновить Playwright adapter;
+- научить planner возвращать вложенный target object.
 
 После прохождения тестов:
 

@@ -8,6 +8,7 @@ from browser_agent.judge import (
 from browser_agent.models import (
     ActionResult,
     BrowserAction,
+    BrowserTarget,
     ExecutionStep,
     ExpectedResultCheck,
     JudgeVerdict,
@@ -53,7 +54,7 @@ def make_case() -> AgentTestCase:
 def make_route() -> list[ExecutionStep]:
     action = BrowserAction(
         action="click",
-        target='role=button[name="Add"]',
+        target=BrowserTarget(strategy="role", value="button", name="Add"),
         value=None,
         reason="Submit the task.",
     )

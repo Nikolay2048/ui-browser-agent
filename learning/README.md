@@ -31,7 +31,8 @@
 | 12 | Playwright adapter | `completed.py` |
 | 13 | Реальный UI-агент | снимки planner contract и runner |
 | 14 | Память planner-а | `completed.py` |
-| 15 | Независимый Judge | текущее задание в models, judge и graph |
+| 15 | Независимый Judge | `completed.py` |
+| 16 | Типизированные browser targets | текущее задание в models, browser и planner |
 
 ## Где писать новый код
 
@@ -44,21 +45,21 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 15 выполняется в:
+Текущее задание урока 16 выполняется в:
 
 ```text
 src/browser_agent/models.py
-src/browser_agent/judge.py
-src/browser_agent/graph.py
+src/browser_agent/browser.py
+src/browser_agent/planner.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_judge_models.py
-tests/test_judge.py
-tests/test_judge_graph.py
-tests/test_graph.py
+tests/test_browser_targets.py
+tests/test_models.py
+tests/test_browser.py
+tests/test_planner.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

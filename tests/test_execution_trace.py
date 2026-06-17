@@ -5,6 +5,7 @@ from browser_agent.executor import make_execute_node
 from browser_agent.models import (
     ActionResult,
     BrowserAction,
+    BrowserTarget,
     ExecutionStep,
     TestCase as AgentTestCase,
 )
@@ -24,7 +25,7 @@ class FakeBrowser:
 def make_action() -> BrowserAction:
     return BrowserAction(
         action="click",
-        target='button "Continue"',
+        target=BrowserTarget(strategy="role", value="button", name="Continue"),
         value=None,
         reason="Continue to the next page.",
     )

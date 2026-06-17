@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from browser_agent.browser import PlaywrightBrowser
+from browser_agent.models import BrowserTarget
 
 
 class FakeLocator:
@@ -70,12 +71,18 @@ def test_current_url_and_open_delegate_to_page() -> None:
     ("target", "expected_call"),
     [
         (
-            'role=button[name="Add"]',
+            BrowserTarget(strategy="role", value="button", name="Add"),
             ("get_by_role", "button", {"name": "Add", "exact": True}),
         ),
-        ("label=Task", ("get_by_label", "Task")),
-        ("text=Saved", ("get_by_text", "Saved", {"exact": True})),
-        ("css=.todo-list li", ("locator", ".todo-list li")),
+        (BrowserTarget(strategy="label", value="Task"), ("get_by_label", "Task")),
+        (
+            BrowserTarget(strategy="text", value="Saved"),
+            ("get_by_text", "Saved", {"exact": True}),
+        ),
+        (
+            BrowserTarget(strategy="css", value=".todo-list li"),
+            ("locator", ".todo-list li"),
+        ),
     ],
 )
 def test_resolve_target_supports_locator_language(
@@ -94,7 +101,7 @@ def test_resolve_target_supports_locator_language(
 def test_resolve_target_rejects_unknown_syntax() -> None:
     browser = PlaywrightBrowser(FakePage())
 
-    with pytest.raises(ValueError, match="Unsupported target"):
+    with pytest.raises(TypeError, match="BrowserTarget"):
         browser._resolve_target('button "Add"')
 
 
@@ -115,10 +122,10 @@ def test_actions_use_resolved_locator() -> None:
     page = FakePage()
     browser = PlaywrightBrowser(page)
 
-    browser.click('role=button[name="Add"]')
-    browser.fill("label=Task", "Learn Playwright")
-    browser.press("label=Task", "Enter")
-    browser.assert_text("text=Learn Playwright")
+    browser.click(BrowserTarget(strategy="role", value="button", name="Add"))
+    browser.fill(BrowserTarget(strategy="label", value="Task"), "Learn Playwright")
+    browser.press(BrowserTarget(strategy="label", value="Task"), "Enter")
+    browser.assert_text(BrowserTarget(strategy="text", value="Learn Playwright"))
 
     assert ("click",) in page.calls
     assert ("fill", "Learn Playwright") in page.calls

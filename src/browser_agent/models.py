@@ -30,11 +30,55 @@ class BrowserActionType(StrEnum):
     FINISH = "finish"
 
 
+class BrowserTargetStrategy(StrEnum):
+    ROLE = "role"
+    LABEL = "label"
+    TEXT = "text"
+    CSS = "css"
+
+
+class BrowserTarget(BaseModel):
+    """Structured browser target.
+    learning/lesson_16_typed_targets/README.md.
+    """
+
+    strategy: BrowserTargetStrategy
+    value: str = Field(min_length=1)
+    name: str | None = None
+
+    @model_validator(mode="after")
+    def validate_target(self) -> "BrowserTarget":
+        if self.strategy is BrowserTargetStrategy.ROLE:
+            if not self.name:
+                raise ValueError("strategy=ROLE requires name")
+        elif self.name is not None:
+            raise ValueError("name is allowed only for strategy=ROLE")
+
+        if (
+                self.strategy is BrowserTargetStrategy.TEXT
+                and len(self.value) >= 2
+                and self.value[0] == self.value[-1]
+                and self.value[0] in {"'", '"'}
+        ):
+            raise ValueError(
+                "TEXT value must not start and end with quotes"
+            )
+
+        return self
+
+    def __str__(self) -> str:
+        match self.strategy:
+            case BrowserTargetStrategy.ROLE:
+                return f'role={self.value}[name="{self.name}"]'
+            case _:
+                return f"{self.strategy.value}={self.value}"
+
+
 class BrowserAction(BaseModel):
     """Exactly one action proposed by the planner."""
 
     action: BrowserActionType
-    target: str | None
+    target: BrowserTarget | None
     value: str | None
     reason: str
 

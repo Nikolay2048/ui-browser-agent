@@ -8,6 +8,7 @@ from browser_agent.graph import (
 from browser_agent.models import (
     ActionResult,
     BrowserAction,
+    BrowserTarget,
     ExpectedResultCheck,
     JudgeVerdict,
     TestCase as AgentTestCase,
@@ -41,7 +42,7 @@ class SnapshotAwareModel:
                 )
             return BrowserAction(
                 action="click",
-                target='button "Continue"',
+                target=BrowserTarget(strategy="role", value="button", name="Continue"),
                 value=None,
                 reason="The Continue button advances the scenario.",
             )
@@ -106,7 +107,7 @@ def test_route_planned_action_distinguishes_finish() -> None:
     )
     click = BrowserAction(
         action="click",
-        target='button "Continue"',
+        target=BrowserTarget(strategy="role", value="button", name="Continue"),
         value=None,
         reason="Continue",
     )
@@ -118,7 +119,7 @@ def test_route_planned_action_distinguishes_finish() -> None:
 def test_route_after_execution_handles_result_and_limit() -> None:
     action = BrowserAction(
         action="click",
-        target='button "Continue"',
+        target=BrowserTarget(strategy="role", value="button", name="Continue"),
         value=None,
         reason="Continue",
     )
@@ -162,7 +163,7 @@ def test_autonomous_graph_observes_until_model_finishes() -> None:
     assert result["current_url"] == "https://example.com/done"
     assert browser.calls == [
         ("snapshot",),
-        ("click", 'button "Continue"'),
+        ("click", BrowserTarget(strategy="role", value="button", name="Continue")),
         ("screenshot",),
         ("snapshot",),
     ]
