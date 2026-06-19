@@ -10,6 +10,7 @@ from browser_agent.models import (
     BrowserAction,
     BrowserTarget,
     ExpectedResultCheck,
+    FailureClassification,
     JudgeVerdict,
     TestCase as AgentTestCase,
 )
@@ -32,6 +33,14 @@ class SnapshotAwareModel:
                         )
                     ],
                     summary="The expected final state is visible.",
+                )
+            if schema is FailureClassification:
+                return FailureClassification(
+                    category="automation_error",
+                    confidence=0.8,
+                    rationale="The browser action repeatedly failed.",
+                    evidence=["Button is blocked."],
+                    should_create_bug=False,
                 )
             if "Goal reached" in rendered:
                 return BrowserAction(
@@ -175,6 +184,7 @@ def test_autonomous_graph_observes_until_model_finishes() -> None:
     assert result["status"] == "passed"
     assert result["verdict"].passed is True
     assert result["termination"].kind == "judge_passed"
+    assert "classification" not in result
     assert result["step_count"] == 1
     assert result["current_url"] == "https://example.com/done"
     assert browser.calls == [
@@ -200,5 +210,6 @@ def test_autonomous_graph_fails_after_browser_error() -> None:
 
     assert result["status"] == "failed"
     assert result["termination"].kind == "failure_limit"
+    assert result["classification"].category == "automation_error"
     assert result["step_count"] == 1
     assert result["last_result"].error == "Button is blocked"

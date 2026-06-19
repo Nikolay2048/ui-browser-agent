@@ -6,6 +6,7 @@ learning/lesson_10_autonomous_loop/README.md.
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
+from browser_agent.classifier import make_classifier_node
 from browser_agent.executor import make_execute_node
 from browser_agent.judge import make_judge_node
 from browser_agent.models import BrowserActionType, RunTermination, TerminationKind
@@ -40,13 +41,13 @@ def fail_run(state: AgentState) -> dict:
     """Mark the scenario as failed."""
     if state["step_count"] >= state["test_case"].max_steps:
         kind = TerminationKind.STEP_LIMIT
-        message = "Step limit reached "+ str(state["step_count"])
+        message = f"Step limit {state['test_case'].max_steps} was reached."
     elif state["failure_count"] >= state["test_case"].max_failures:
         kind = TerminationKind.FAILURE_LIMIT
-        message = "Step failure limit reached "+ str(state["step_count"])
+        message = f"Failure limit {state['test_case'].max_failures} was reached."
     elif "verdict" in state and not state["verdict"].passed:
         kind = TerminationKind.JUDGE_FAILED
-        message =state["verdict"].summary
+        message = state["verdict"].summary
     else:
         raise RuntimeError("Cannot determine failure termination reason")
     return {
@@ -83,9 +84,10 @@ def route_after_judge(state: AgentState) -> str:
     return "fail_run"
 
 
-def build_agent_graph(model, browser, judge_model=None):
+def build_agent_graph(model, browser, judge_model=None, classifier_model=None):
     """Compile the first autonomous observe-plan-act loop."""
     judge_model = judge_model or model
+    classifier_model = classifier_model or model
 
     builder = StateGraph(AgentState)
 
@@ -94,6 +96,7 @@ def build_agent_graph(model, browser, judge_model=None):
     builder.add_node("plan", make_plan_node(model))
     builder.add_node("execute", make_execute_node(browser))
     builder.add_node("judge", make_judge_node(judge_model))
+    builder.add_node("classify_failure", make_classifier_node(classifier_model))
     builder.add_node("pass_run", pass_run)
     builder.add_node("fail_run", fail_run)
 
@@ -101,7 +104,8 @@ def build_agent_graph(model, browser, judge_model=None):
     builder.add_edge("initialize", "observe")
     builder.add_edge("observe", "plan")
     builder.add_edge("pass_run", END)
-    builder.add_edge("fail_run", END)
+    builder.add_edge("fail_run", "classify_failure")
+    builder.add_edge("classify_failure", END)
 
     builder.add_conditional_edges(
         "plan",

@@ -30,13 +30,13 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 18: [причина завершения](learning/lesson_18_termination_reason/README.md).
+Урок 19: [Failure Classifier](learning/lesson_19_failure_classifier/README.md).
 
 Нужно:
 
-- добавить структурированную причину завершения;
-- согласовать terminal nodes с routing policy;
-- подготовить данные для Failure Classifier и Run Report.
+- классифицировать неуспешный запуск по evidence;
+- отличать product bug от ошибок агента, автоматизации и окружения;
+- рекомендовать bug report только при достаточных основаниях.
 
 После прохождения тестов:
 

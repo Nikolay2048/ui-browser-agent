@@ -36,6 +36,9 @@ def print_state(state: dict) -> None:
     if termination := state.get("termination"):
         print("termination:")
         pprint(termination.model_dump(), sort_dicts=False)
+    if classification := state.get("classification"):
+        print("classification:")
+        pprint(classification.model_dump(), sort_dicts=False)
 
 
 def main() -> None:
@@ -43,7 +46,7 @@ def main() -> None:
         PROJECT_ROOT / "examples" / "playwright_fixture.html"
     ).resolve().as_uri()
     model_name = os.getenv("OLLAMA_MODEL", "qwen3.6:35b")
-
+    print(f"model name: {model_name}")
     test_case = TestCase(
         id="first-real-agent",
         name="Create a task using the autonomous agent",
@@ -82,6 +85,10 @@ def main() -> None:
         print(f"steps: {result['step_count']}")
         print(f"failures: {result['failure_count']}")
         print(f"termination: {result['termination'].kind}")
+        if classification := result.get("classification"):
+            print(f"classification: {classification.category}")
+            print(f"confidence: {classification.confidence}")
+            print(f"create bug: {classification.should_create_bug}")
         print(f"route records: {len(result['route'])}")
         input("\nPress Enter to close Chromium...")
         chromium.close()
