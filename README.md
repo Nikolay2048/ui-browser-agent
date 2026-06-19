@@ -30,18 +30,18 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 16: [типизированные browser targets](learning/lesson_16_typed_targets/README.md).
+Урок 17: [ограниченное восстановление](learning/lesson_17_bounded_recovery/README.md).
 
 Нужно:
 
-- заменить строковый `target` на `BrowserTarget`;
-- обновить Playwright adapter;
-- научить planner возвращать вложенный target object.
+- добавить настраиваемый бюджет browser-action ошибок;
+- после первой ошибки повторно наблюдать страницу и перепланировать;
+- детерминированно останавливать граф при исчерпании бюджета.
 
 После прохождения тестов:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_real_agent.py
+python scripts\run_real_agent.py
 ```
 
 ## Проверка
@@ -49,7 +49,7 @@ src/browser_agent/graph.py
 Только актуальный агент:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest -q
+python -m pytest -q
 ```
 
 Тесты прошлых уроков по умолчанию не запускаются.

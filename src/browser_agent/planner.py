@@ -22,37 +22,37 @@ Target must be an object.
 Use one of these target object formats:
 
 Role target:
-{
+{{
   "strategy": "role",
   "value": "button",
   "name": "Login"
-}
+}}
 
 Label target:
-{
+{{
   "strategy": "label",
   "value": "Username"
-}
+}}
 
 Text target:
-{
+{{
   "strategy": "text",
   "value": "Products"
-}
+}}
 
 CSS target:
-{
+{{
   "strategy": "css",
   "value": ".some-selector"
-}
+}}
 
 The accessibility snapshot syntax is descriptive and is not a valid target.
 Never copy snapshot entries directly into target.
 
 Convert snapshot elements to target objects:
-- textbox "Task" -> {"strategy": "label", "value": "Task"}
-- button "Add" -> {"strategy": "role", "value": "button", "name": "Add"}
-- visible text "Products" -> {"strategy": "text", "value": "Products"}
+- textbox "Task" -> {{"strategy": "label", "value": "Task"}}
+- button "Add" -> {{"strategy": "role", "value": "button", "name": "Add"}}
+- visible text "Products" -> {{"strategy": "text", "value": "Products"}}
 
 Invalid targets include:
 - "label=Task"

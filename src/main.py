@@ -1,7 +1,7 @@
-from src.browser_agent.graph import build_learning_graph
+from browser_agent.graph import build_agent_graph
 from src.browser_agent.models import TestCase
 
-graph = build_learning_graph()
+graph = build_agent_graph()
 
 test_case =TestCase(
 

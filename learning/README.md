@@ -32,7 +32,8 @@
 | 13 | Реальный UI-агент | снимки planner contract и runner |
 | 14 | Память planner-а | `completed.py` |
 | 15 | Независимый Judge | `completed.py` |
-| 16 | Типизированные browser targets | текущее задание в models, browser и planner |
+| 16 | Типизированные browser targets | `completed.py` |
+| 17 | Ограниченное восстановление | текущее задание в models, executor и graph |
 
 ## Где писать новый код
 
@@ -45,21 +46,20 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 16 выполняется в:
+Текущее задание урока 17 выполняется в:
 
 ```text
 src/browser_agent/models.py
-src/browser_agent/browser.py
-src/browser_agent/planner.py
+src/browser_agent/executor.py
+src/browser_agent/graph.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_browser_targets.py
-tests/test_models.py
-tests/test_browser.py
-tests/test_planner.py
+tests/test_recovery.py
+tests/test_executor.py
+tests/test_graph.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

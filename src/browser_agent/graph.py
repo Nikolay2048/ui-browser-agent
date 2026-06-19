@@ -20,6 +20,7 @@ def initialize(state: AgentState) -> dict:
         "current_url": state["test_case"].start_url,
         "route": [],
         "step_count": 0,
+        "failure_count": 0,
         "status": "running",
     }
 
@@ -42,9 +43,15 @@ def route_planned_action(state: AgentState) -> str:
 
 
 def route_after_execution(state: AgentState) -> str:
-    """Retry observation or terminate after failure/step limit."""
-    if not state["last_result"].success or state["step_count"] >= state["test_case"].max_steps:
+    if state["step_count"] >= state["test_case"].max_steps:
         return "fail_run"
+
+    if state["last_result"].success:
+        return "observe"
+
+    if state["failure_count"] >= state["test_case"].max_failures:
+        return "fail_run"
+
     return "observe"
 
 

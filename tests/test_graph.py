@@ -80,6 +80,8 @@ def make_state(
     result: ActionResult | None = None,
     step_count: int = 0,
     max_steps: int = 3,
+    failure_count: int = 0,
+    max_failures: int = 2,
 ) -> dict:
     state = {
         "test_case": AgentTestCase(
@@ -88,9 +90,11 @@ def make_state(
             start_url="https://example.com/start",
             goal="Reach the done page",
             max_steps=max_steps,
+            max_failures=max_failures,
         ),
         "proposed_action": action,
         "step_count": step_count,
+        "failure_count": failure_count,
         "status": "running",
     }
     if result is not None:
@@ -136,7 +140,18 @@ def test_route_after_execution_handles_result_and_limit() -> None:
     )
 
     assert route_after_execution(make_state(action, success, step_count=1)) == "observe"
-    assert route_after_execution(make_state(action, failure, step_count=1)) == "fail_run"
+    assert (
+        route_after_execution(
+            make_state(
+                action,
+                failure,
+                step_count=2,
+                failure_count=2,
+                max_failures=2,
+            )
+        )
+        == "fail_run"
+    )
     assert (
         route_after_execution(make_state(action, success, step_count=3, max_steps=3))
         == "fail_run"
@@ -177,6 +192,7 @@ def test_autonomous_graph_fails_after_browser_error() -> None:
         name="Autonomous failure",
         start_url="https://example.com/start",
         goal="Reach the done page",
+        max_failures=1,
     )
 
     result = graph.invoke({"test_case": case})

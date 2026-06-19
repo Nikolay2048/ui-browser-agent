@@ -19,6 +19,7 @@ class AgentState(TypedDict):
     current_url: NotRequired[str]
     route: NotRequired[list[ExecutionStep]]
     step_count: NotRequired[int]
+    failure_count: NotRequired[int]
     status: NotRequired[Literal["running", "passed", "failed"]]
     page_snapshot: NotRequired[str]
     proposed_action: NotRequired[BrowserAction]

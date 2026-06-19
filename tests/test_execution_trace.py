@@ -51,6 +51,7 @@ def make_state(route: list[ExecutionStep] | None = None) -> dict:
         "current_url": "https://example.com/start",
         "route": [] if route is None else route,
         "step_count": len(route or []),
+        "failure_count": 0,
         "status": "running",
         "page_snapshot": '- button "Continue"',
         "proposed_action": make_action(),

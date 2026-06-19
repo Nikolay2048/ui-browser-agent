@@ -49,6 +49,7 @@ def make_state(action: BrowserAction) -> dict:
         "current_url": "https://example.com/login",
         "route": [],
         "step_count": 0,
+        "failure_count": 0,
         "status": "running",
         "page_snapshot": '- button "Login"',
         "proposed_action": action,
@@ -110,6 +111,11 @@ def test_execute_node_returns_partial_update() -> None:
         )
     )
 
-    assert list(update) == ["last_result", "step_count", "route"]
+    assert list(update) == [
+        "last_result",
+        "step_count",
+        "failure_count",
+        "route",
+    ]
     assert update["last_result"].success is True
     assert update["step_count"] == 1

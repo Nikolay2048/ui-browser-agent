@@ -20,6 +20,7 @@ class TestCase(BaseModel):
     test_data: dict[str, Any] = Field(default_factory=dict)
     expected: list[str] = Field(default_factory=list)
     max_steps: int = Field(default=20, ge=1, le=100)
+    max_failures: int = Field(default=2, ge=1, le=20)
 
 
 class BrowserActionType(StrEnum):

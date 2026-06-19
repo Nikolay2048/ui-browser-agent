@@ -65,6 +65,9 @@ def make_execute_node(browser):
             action=state["proposed_action"],
         )
 
+        next_failure_count = state["failure_count"]
+        if not result.success:
+            next_failure_count += 1
         step = ExecutionStep(
             step_number=next_step_number,
             page_snapshot=state["page_snapshot"],
@@ -75,6 +78,7 @@ def make_execute_node(browser):
         return {
             "last_result": result,
             "step_count": next_step_number,
+            "failure_count": next_failure_count,
             "route": [*state["route"], step],
         }
 

@@ -83,7 +83,7 @@ def test_planner_prompt_defines_supported_target_language() -> None:
     messages = model.received_prompt.to_messages()
     system_prompt = str(messages[0].content)
 
-    assert "target must be an object" in system_prompt
+    assert "target must be an object" in system_prompt.lower()
     assert '"strategy": "role"' in system_prompt
     assert '"value": "button"' in system_prompt
     assert '"name": "Login"' in system_prompt
