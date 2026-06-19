@@ -8,7 +8,7 @@ from langgraph.graph import StateGraph
 
 from browser_agent.executor import make_execute_node
 from browser_agent.judge import make_judge_node
-from browser_agent.models import BrowserActionType
+from browser_agent.models import BrowserActionType, RunTermination, TerminationKind
 from browser_agent.observer import make_observe_node
 from browser_agent.planner import make_plan_node
 from browser_agent.state import AgentState
@@ -25,14 +25,36 @@ def initialize(state: AgentState) -> dict:
     }
 
 
-def pass_run(_state: AgentState) -> dict:
+def pass_run(state: AgentState) -> dict:
     """Mark the scenario as passed."""
-    return {"status": "passed"}
+    return {
+        "status": "passed",
+        "termination": RunTermination(
+            kind=TerminationKind.JUDGE_PASSED,
+            message="Judge proved every expected result.",
+        ),
+    }
 
 
-def fail_run(_state: AgentState) -> dict:
+def fail_run(state: AgentState) -> dict:
     """Mark the scenario as failed."""
-    return {"status": "failed"}
+    if state["step_count"] >= state["test_case"].max_steps:
+        kind = TerminationKind.STEP_LIMIT
+        message = "Step limit reached "+ str(state["step_count"])
+    elif state["failure_count"] >= state["test_case"].max_failures:
+        kind = TerminationKind.FAILURE_LIMIT
+        message = "Step failure limit reached "+ str(state["step_count"])
+    elif "verdict" in state and not state["verdict"].passed:
+        kind = TerminationKind.JUDGE_FAILED
+        message =state["verdict"].summary
+    else:
+        raise RuntimeError("Cannot determine failure termination reason")
+    return {
+        "status": "failed",
+        "termination": RunTermination(
+            kind=kind,
+            message=message
+        )}
 
 
 def route_planned_action(state: AgentState) -> str:

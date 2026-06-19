@@ -174,6 +174,7 @@ def test_autonomous_graph_observes_until_model_finishes() -> None:
 
     assert result["status"] == "passed"
     assert result["verdict"].passed is True
+    assert result["termination"].kind == "judge_passed"
     assert result["step_count"] == 1
     assert result["current_url"] == "https://example.com/done"
     assert browser.calls == [
@@ -198,5 +199,6 @@ def test_autonomous_graph_fails_after_browser_error() -> None:
     result = graph.invoke({"test_case": case})
 
     assert result["status"] == "failed"
+    assert result["termination"].kind == "failure_limit"
     assert result["step_count"] == 1
     assert result["last_result"].error == "Button is blocked"

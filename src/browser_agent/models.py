@@ -147,3 +147,17 @@ class JudgeVerdict(BaseModel):
             raise ValueError("passed must be true only when every check passed")
 
         return self
+
+
+class TerminationKind(StrEnum):
+    JUDGE_PASSED = "judge_passed"
+    JUDGE_FAILED = "judge_failed"
+    STEP_LIMIT = "step_limit"
+    FAILURE_LIMIT = "failure_limit"
+
+
+class RunTermination(BaseModel):
+    """Why the graph stopped."""
+
+    kind: TerminationKind
+    message: str = Field(min_length=1)

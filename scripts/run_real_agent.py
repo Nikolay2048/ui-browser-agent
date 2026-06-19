@@ -21,6 +21,7 @@ def print_state(state: dict) -> None:
     print(
         f"status={state.get('status')} "
         f"step_count={state.get('step_count')} "
+        f"failure_count={state.get('failure_count')} "
         f"url={state.get('current_url')}"
     )
     if action := state.get("proposed_action"):
@@ -29,6 +30,12 @@ def print_state(state: dict) -> None:
     if result := state.get("last_result"):
         print("last_result:")
         pprint(result.model_dump(), sort_dicts=False)
+    if verdict := state.get("verdict"):
+        print("verdict:")
+        pprint(verdict.model_dump(), sort_dicts=False)
+    if termination := state.get("termination"):
+        print("termination:")
+        pprint(termination.model_dump(), sort_dicts=False)
 
 
 def main() -> None:
@@ -73,6 +80,8 @@ def main() -> None:
         print("\nFINAL RESULT")
         print(f"status: {result['status']}")
         print(f"steps: {result['step_count']}")
+        print(f"failures: {result['failure_count']}")
+        print(f"termination: {result['termination'].kind}")
         print(f"route records: {len(result['route'])}")
         input("\nPress Enter to close Chromium...")
         chromium.close()

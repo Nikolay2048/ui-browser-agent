@@ -9,6 +9,7 @@ from browser_agent.models import (
     BrowserAction,
     ExecutionStep,
     JudgeVerdict,
+    RunTermination,
     TestCase,
 )
 
@@ -25,3 +26,4 @@ class AgentState(TypedDict):
     proposed_action: NotRequired[BrowserAction]
     last_result: NotRequired[ActionResult]
     verdict: NotRequired[JudgeVerdict]
+    termination: NotRequired[RunTermination]

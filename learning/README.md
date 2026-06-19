@@ -33,7 +33,8 @@
 | 14 | Память planner-а | `completed.py` |
 | 15 | Независимый Judge | `completed.py` |
 | 16 | Типизированные browser targets | `completed.py` |
-| 17 | Ограниченное восстановление | текущее задание в models, executor и graph |
+| 17 | Ограниченное восстановление | `completed.py` |
+| 18 | Причина завершения | текущее задание в models и terminal nodes |
 
 ## Где писать новый код
 
@@ -46,19 +47,17 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 17 выполняется в:
+Текущее задание урока 18 выполняется в:
 
 ```text
 src/browser_agent/models.py
-src/browser_agent/executor.py
 src/browser_agent/graph.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_recovery.py
-tests/test_executor.py
+tests/test_termination.py
 tests/test_graph.py
 ```
 
