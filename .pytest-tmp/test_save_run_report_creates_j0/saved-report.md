@@ -18,6 +18,12 @@ Create task Learn agents
 - Learn agents is visible
 
 
+## Execution Route
+
+
+No browser actions were executed.
+
+
 ## Termination
 
 **Kind:** judge_passed

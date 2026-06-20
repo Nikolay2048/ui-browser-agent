@@ -4,10 +4,14 @@ import os
 import sys
 from pathlib import Path
 from pprint import pprint
-
+from uuid import uuid4
+from langgraph.checkpoint.memory import InMemorySaver
 from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
 from playwright.sync_api import sync_playwright
+
+from browser_agent.graph import build_agent_graph
+from browser_agent.persistence import build_thread_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -84,6 +88,8 @@ def main() -> None:
             page,
             artifacts_dir=PROJECT_ROOT / "artifacts" / test_case.id,
         )
+        checkpointer = InMemorySaver()
+        thread_id = f"{test_case.id}:{uuid4()}"
 
         result = run_agent(
             model=model,
@@ -91,7 +97,24 @@ def main() -> None:
             test_case=test_case,
             on_state=print_state,
             report_dir=PROJECT_ROOT / "artifacts" / test_case.id / "report",
+            checkpointer=checkpointer,
+            thread_id=thread_id,
         )
+
+        config = build_thread_config(test_case, thread_id)
+
+        checkpoint_graph = build_agent_graph(
+            model,
+            browser,
+            checkpointer=checkpointer,
+        )
+
+        snapshot = checkpoint_graph.get_state(config)
+
+        print("\nCHECKPOINT")
+        print(f"checkpoint thread: {thread_id}")
+        print(f"checkpoint status: {snapshot.values['status']}")
+        print(f"checkpoint next: {snapshot.next}")
 
         print("\nFINAL RESULT")
         print(f"status: {result['status']}")

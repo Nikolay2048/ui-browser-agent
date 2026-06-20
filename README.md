@@ -30,13 +30,14 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 22: [LangSmith observability](learning/lesson_22_langsmith_observability/README.md).
+Урок 23: [Checkpointing и thread_id](learning/lesson_23_checkpointing/README.md).
 
 Нужно:
 
-- включить автоматическую трассировку LangGraph;
-- добавить run name, tags и безопасные metadata;
-- научиться анализировать Planner, Judge, Classifier и Reporter в LangSmith.
+- подключить LangGraph checkpointer;
+- связать историю состояния с `thread_id`;
+- научиться читать сохранённый StateSnapshot;
+- понять ограничения восстановления Playwright-сессии.
 
 После прохождения тестов:
 

@@ -18,6 +18,12 @@ Verify page is available
 - Page is available
 
 
+## Execution Route
+
+
+No browser actions were executed.
+
+
 ## Termination
 
 **Kind:** judge_passed

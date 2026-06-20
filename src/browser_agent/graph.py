@@ -92,7 +92,14 @@ def route_after_classification(state: AgentState) -> str:
     return "end"
 
 
-def build_agent_graph(model, browser, judge_model=None, classifier_model=None, reporter_model=None, ):
+def build_agent_graph(
+        model,
+        browser,
+        judge_model=None,
+        classifier_model=None,
+        reporter_model=None,
+        checkpointer=None,
+):
     """Compile the first autonomous observe-plan-act loop."""
     judge_model = judge_model or model
     classifier_model = classifier_model or model
@@ -151,6 +158,4 @@ def build_agent_graph(model, browser, judge_model=None, classifier_model=None, r
         },
     )
 
-
-
-    return builder.compile()
+    return builder.compile(checkpointer=checkpointer)
