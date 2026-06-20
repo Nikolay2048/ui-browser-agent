@@ -18,6 +18,23 @@
 - {{ expected }}
 {% endfor %}
 
+## Execution Route
+
+{% if report.route %}
+{% for step in report.route %}
+### Step {{ step.step_number }}
+
+- **Action:** {{ step.action.action }}
+- **Target:** {{ step.action.target }}
+- **Success:** {{ step.result.success }}
+{% if step.result.error %}
+- **Error:** {{ step.result.error }}
+{% endif %}
+{% endfor %}
+{% else %}
+No browser actions were executed.
+{% endif %}
+
 ## Termination
 
 **Kind:** {{ report.termination.kind }}
@@ -51,6 +68,26 @@ No failure classification was required.
 ### {{ report.bug_report.title }}
 
 **Severity:** {{ report.bug_report.severity }}
+
+### Steps to Reproduce
+
+{% for step in report.bug_report.steps_to_reproduce %}
+{{ loop.index }}. {{ step }}
+{% endfor %}
+
+### Expected Result
+
+{{ report.bug_report.expected_result }}
+
+### Actual Result
+
+{{ report.bug_report.actual_result }}
+
+### Evidence
+
+{% for evidence in report.bug_report.evidence %}
+- {{ evidence }}
+{% endfor %}
 {% else %}
 No bug report was created.
 {% endif %}

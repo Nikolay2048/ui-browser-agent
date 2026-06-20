@@ -37,7 +37,8 @@
 | 18 | Причина завершения | `completed.py` |
 | 19 | Failure Classifier | `completed.py` |
 | 20 | Bug Reporter | `completed.py` |
-| 21 | RunReport, JSON и Markdown | текущее задание в models, reporting и runner |
+| 21 | RunReport, JSON и Markdown | `completed.py` |
+| 22 | LangSmith observability | текущее задание в observability и runner |
 
 ## Где писать новый код
 
@@ -50,20 +51,19 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 21 выполняется в:
+Текущее задание урока 22 выполняется в:
 
 ```text
-src/browser_agent/models.py
-src/browser_agent/reporting.py
+src/browser_agent/observability.py
 src/browser_agent/runner.py
+scripts/run_real_agent.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_run_report_models.py
-tests/test_reporting.py
-tests/test_runner_reporting.py
+tests/test_observability.py
+tests/test_runner_observability.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

@@ -30,13 +30,13 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 21: [RunReport и сохранение результата](learning/lesson_21_run_report/README.md).
+Урок 22: [LangSmith observability](learning/lesson_22_langsmith_observability/README.md).
 
 Нужно:
 
-- отделить итоговый отчёт от рабочего состояния LangGraph;
-- сохранить результат в JSON для машинной обработки;
-- сформировать Markdown-отчёт для человека.
+- включить автоматическую трассировку LangGraph;
+- добавить run name, tags и безопасные metadata;
+- научиться анализировать Planner, Judge, Classifier и Reporter в LangSmith.
 
 После прохождения тестов:
 

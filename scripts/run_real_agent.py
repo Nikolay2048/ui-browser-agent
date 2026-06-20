@@ -1,19 +1,23 @@
 """Run lesson 13 with Ollama, LangGraph, Playwright, and visible Chromium."""
 
 import os
+import sys
 from pathlib import Path
 from pprint import pprint
-import sys
 
+from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
 from playwright.sync_api import sync_playwright
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(PROJECT_ROOT / ".env")
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from browser_agent.browser import PlaywrightBrowser
 from browser_agent.models import TestCase
 from browser_agent.runner import run_agent
+
+
 
 
 def print_state(state: dict) -> None:
@@ -46,9 +50,10 @@ def print_state(state: dict) -> None:
 
 def main() -> None:
     fixture_url = (
-        PROJECT_ROOT / "examples" / "playwright_fixture.html"
+            PROJECT_ROOT / "examples" / "playwright_fixture.html"
     ).resolve().as_uri()
     model_name = os.getenv("OLLAMA_MODEL", "qwen3.6:35b")
+
     print(f"model name: {model_name}")
     test_case = TestCase(
         id="first-real-agent",
