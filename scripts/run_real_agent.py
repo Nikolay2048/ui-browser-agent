@@ -68,6 +68,10 @@ def main() -> None:
         model=model_name,
         temperature=0,
         validate_model_on_init=True,
+        metadata={
+            "ls_model_name": model_name,
+            "ls_provider": "ollama",
+        },
     )
 
     with sync_playwright() as playwright:
