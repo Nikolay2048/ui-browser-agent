@@ -39,6 +39,9 @@ def print_state(state: dict) -> None:
     if classification := state.get("classification"):
         print("classification:")
         pprint(classification.model_dump(), sort_dicts=False)
+    if bug_report := state.get("bug_report"):
+        print("bug_report:")
+        pprint(bug_report.model_dump(), sort_dicts=False)
 
 
 def main() -> None:
@@ -89,6 +92,9 @@ def main() -> None:
             print(f"classification: {classification.category}")
             print(f"confidence: {classification.confidence}")
             print(f"create bug: {classification.should_create_bug}")
+        if bug_report := result.get("bug_report"):
+            print(f"bug title: {bug_report.title}")
+            print(f"bug severity: {bug_report.severity}")
         print(f"route records: {len(result['route'])}")
         input("\nPress Enter to close Chromium...")
         chromium.close()

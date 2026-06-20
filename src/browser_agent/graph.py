@@ -12,6 +12,7 @@ from browser_agent.judge import make_judge_node
 from browser_agent.models import BrowserActionType, RunTermination, TerminationKind
 from browser_agent.observer import make_observe_node
 from browser_agent.planner import make_plan_node
+from browser_agent.reporter import make_reporter_node
 from browser_agent.state import AgentState
 
 
@@ -84,10 +85,18 @@ def route_after_judge(state: AgentState) -> str:
     return "fail_run"
 
 
-def build_agent_graph(model, browser, judge_model=None, classifier_model=None):
+def route_after_classification(state: AgentState) -> str:
+    """route bug-worthy classifications to reporter."""
+    if state["classification"].should_create_bug:
+        return "report_bug"
+    return "end"
+
+
+def build_agent_graph(model, browser, judge_model=None, classifier_model=None, reporter_model=None, ):
     """Compile the first autonomous observe-plan-act loop."""
     judge_model = judge_model or model
     classifier_model = classifier_model or model
+    reporter_model = reporter_model or model
 
     builder = StateGraph(AgentState)
 
@@ -97,6 +106,7 @@ def build_agent_graph(model, browser, judge_model=None, classifier_model=None):
     builder.add_node("execute", make_execute_node(browser))
     builder.add_node("judge", make_judge_node(judge_model))
     builder.add_node("classify_failure", make_classifier_node(classifier_model))
+    builder.add_node("report_bug", make_reporter_node(reporter_model))
     builder.add_node("pass_run", pass_run)
     builder.add_node("fail_run", fail_run)
 
@@ -105,7 +115,7 @@ def build_agent_graph(model, browser, judge_model=None, classifier_model=None):
     builder.add_edge("observe", "plan")
     builder.add_edge("pass_run", END)
     builder.add_edge("fail_run", "classify_failure")
-    builder.add_edge("classify_failure", END)
+    builder.add_edge("report_bug", END)
 
     builder.add_conditional_edges(
         "plan",
@@ -131,5 +141,16 @@ def build_agent_graph(model, browser, judge_model=None, classifier_model=None):
             "fail_run": "fail_run",
             "observe": "observe"
         })
+
+    builder.add_conditional_edges(
+        "classify_failure",
+        route_after_classification,
+        {
+            "report_bug": "report_bug",
+            "end": END,
+        },
+    )
+
+
 
     return builder.compile()

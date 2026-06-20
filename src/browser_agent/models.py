@@ -190,3 +190,23 @@ class FailureClassification(BaseModel):
                 "Only product_bug can recommend creating a bug"
             )
         return self
+
+
+class BugSeverity(StrEnum):
+    BLOCKER = "blocker"
+    CRITICAL = "critical"
+    MAJOR = "major"
+    MINOR = "minor"
+
+
+class BugReport(BaseModel):
+    """Structured product bug report."""
+
+    test_case_id: str = Field(min_length=1)
+    title: str = Field(min_length=5)
+    severity: BugSeverity
+    preconditions: list[str] = Field(min_length=1)
+    steps_to_reproduce: list[str] = Field(min_length=1)
+    expected_result: str = Field(min_length=1)
+    actual_result: str = Field(min_length=1)
+    evidence: list[str] = Field(min_length=1)

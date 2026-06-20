@@ -35,7 +35,8 @@
 | 16 | Типизированные browser targets | `completed.py` |
 | 17 | Ограниченное восстановление | `completed.py` |
 | 18 | Причина завершения | `completed.py` |
-| 19 | Failure Classifier | текущее задание в models, classifier и graph |
+| 19 | Failure Classifier | `completed.py` |
+| 20 | Bug Reporter | текущее задание в models, reporter и graph |
 
 ## Где писать новый код
 
@@ -48,21 +49,20 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 19 выполняется в:
+Текущее задание урока 20 выполняется в:
 
 ```text
 src/browser_agent/models.py
-src/browser_agent/classifier.py
+src/browser_agent/reporter.py
 src/browser_agent/graph.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_classifier_models.py
-tests/test_classifier.py
-tests/test_classifier_graph.py
-tests/test_graph.py
+tests/test_bug_report_models.py
+tests/test_reporter.py
+tests/test_reporter_graph.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

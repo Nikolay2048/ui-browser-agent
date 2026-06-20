@@ -30,13 +30,13 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 19: [Failure Classifier](learning/lesson_19_failure_classifier/README.md).
+Урок 20: [структурированный Bug Reporter](learning/lesson_20_bug_reporter/README.md).
 
 Нужно:
 
-- классифицировать неуспешный запуск по evidence;
-- отличать product bug от ошибок агента, автоматизации и окружения;
-- рекомендовать bug report только при достаточных основаниях.
+- создать строгую модель bug report;
+- оформить evidence в воспроизводимые шаги;
+- создавать баг только после рекомендации Failure Classifier.
 
 После прохождения тестов:
 

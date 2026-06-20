@@ -1,7 +1,5 @@
 """Failure classification role for lesson 19."""
-from typing import Any
 
-from anyio.itertools import Chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 
