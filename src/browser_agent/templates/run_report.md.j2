@@ -1,0 +1,56 @@
+# Test Run: {{ report.test_case.name }}
+
+## Summary
+
+**Status:** {{ report.status }}
+**Test case:** {{ report.test_case.id }}
+**Final URL:** {{ report.final_url }}
+**Steps:** {{ report.step_count }}
+**Failures:** {{ report.failure_count }}
+
+## Goal
+
+{{ report.test_case.goal }}
+
+## Expected Results
+
+{% for expected in report.test_case.expected %}
+- {{ expected }}
+{% endfor %}
+
+## Termination
+
+**Kind:** {{ report.termination.kind }}
+
+{{ report.termination.message }}
+
+## Judge Verdict
+
+{% if report.verdict %}
+**Passed:** {{ report.verdict.passed }}
+
+{{ report.verdict.summary }}
+{% else %}
+No Judge verdict was recorded.
+{% endif %}
+
+## Failure Classification
+
+{% if report.classification %}
+**Category:** {{ report.classification.category }}
+**Confidence:** {{ report.classification.confidence }}
+
+{{ report.classification.rationale }}
+{% else %}
+No failure classification was required.
+{% endif %}
+
+## Bug Report
+
+{% if report.bug_report %}
+### {{ report.bug_report.title }}
+
+**Severity:** {{ report.bug_report.severity }}
+{% else %}
+No bug report was created.
+{% endif %}

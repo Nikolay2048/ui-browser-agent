@@ -5,7 +5,7 @@ Do not add LangGraph, LangChain, or Playwright code to this module.
 """
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -210,3 +210,19 @@ class BugReport(BaseModel):
     expected_result: str = Field(min_length=1)
     actual_result: str = Field(min_length=1)
     evidence: list[str] = Field(min_length=1)
+
+
+class RunReport(BaseModel):
+    """Stable result of one completed agent run."""
+
+    test_case: TestCase
+    status: Literal["passed", "failed"]
+    final_url: str = Field(min_length=1)
+    final_snapshot: str = Field(min_length=1)
+    step_count: int = Field(ge=0)
+    failure_count: int = Field(ge=0)
+    route: list[ExecutionStep]
+    termination: RunTermination
+    verdict: JudgeVerdict | None = None
+    classification: FailureClassification | None = None
+    bug_report: BugReport | None = None

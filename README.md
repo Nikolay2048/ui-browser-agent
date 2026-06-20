@@ -30,13 +30,13 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 20: [структурированный Bug Reporter](learning/lesson_20_bug_reporter/README.md).
+Урок 21: [RunReport и сохранение результата](learning/lesson_21_run_report/README.md).
 
 Нужно:
 
-- создать строгую модель bug report;
-- оформить evidence в воспроизводимые шаги;
-- создавать баг только после рекомендации Failure Classifier.
+- отделить итоговый отчёт от рабочего состояния LangGraph;
+- сохранить результат в JSON для машинной обработки;
+- сформировать Markdown-отчёт для человека.
 
 После прохождения тестов:
 

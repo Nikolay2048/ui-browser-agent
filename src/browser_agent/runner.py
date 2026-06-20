@@ -1,7 +1,9 @@
 """Composition layer for running the agent against a real browser."""
 
 from collections.abc import Callable
+from pathlib import Path
 
+from browser_agent.reporting import build_run_report, save_run_report
 from browser_agent.graph import build_agent_graph
 from browser_agent.models import TestCase
 
@@ -11,6 +13,7 @@ def run_agent(
         browser,
         test_case: TestCase,
         on_state: Callable[[dict], None] | None = None,
+        report_dir: str | Path | None = None,
 ) -> dict:
     """Open the start URL, stream the graph, and return its final state.
 
@@ -28,5 +31,9 @@ def run_agent(
 
     if final_state is None:
         raise RuntimeError("Agent graph produced no state")
+
+    if report_dir is not None:
+        report = build_run_report(final_state)
+        save_run_report(report, report_dir)
 
     return final_state

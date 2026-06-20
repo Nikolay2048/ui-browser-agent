@@ -81,6 +81,7 @@ def main() -> None:
             browser=browser,
             test_case=test_case,
             on_state=print_state,
+            report_dir=PROJECT_ROOT / "artifacts" / test_case.id / "report",
         )
 
         print("\nFINAL RESULT")
