@@ -241,3 +241,10 @@ class ActionApproval(BaseModel):
         if not value.strip():
             raise ValueError("reason must not be blank")
         return value
+
+
+class ApprovalPolicyDecision(BaseModel):
+    """Deterministic decision whether an action needs human review."""
+
+    requires_approval: bool
+    reason: str = Field(min_length=1)

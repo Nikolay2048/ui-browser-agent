@@ -7,6 +7,7 @@ from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
 from browser_agent.approval import request_action_approval, reject_run, route_after_approval
+from browser_agent.approval_policy import make_assess_action_node, route_after_risk_assessment
 from browser_agent.classifier import make_classifier_node
 from browser_agent.executor import make_execute_node
 from browser_agent.judge import make_judge_node
@@ -101,11 +102,17 @@ def build_agent_graph(
         reporter_model=None,
         checkpointer=None,
         require_approval: bool = False,
+approval_policy_enabled: bool = False,
 ):
     """Compile the first autonomous observe-plan-act loop."""
     judge_model = judge_model or model
     classifier_model = classifier_model or model
     reporter_model = reporter_model or model
+
+    if require_approval and approval_policy_enabled:
+        raise ValueError(
+            "require_approval and approval_policy_enabled are mutually exclusive"
+        )
 
     builder = StateGraph(AgentState)
 
@@ -116,7 +123,9 @@ def build_agent_graph(
     builder.add_node("judge", make_judge_node(judge_model))
     builder.add_node("classify_failure", make_classifier_node(classifier_model))
     builder.add_node("report_bug", make_reporter_node(reporter_model))
-    if require_approval:
+    approval_enabled = require_approval or approval_policy_enabled
+
+    if approval_enabled:
         builder.add_node("request_approval", request_action_approval)
         builder.add_node("reject_run", reject_run)
 
@@ -129,6 +138,21 @@ def build_agent_graph(
             },
         )
         builder.add_edge("reject_run", END)
+
+    if approval_policy_enabled:
+        builder.add_node(
+            "assess_action_risk",
+            make_assess_action_node(),
+        )
+
+        builder.add_conditional_edges(
+            "assess_action_risk",
+            route_after_risk_assessment,
+            {
+                "request_approval": "request_approval",
+                "execute": "execute",
+            },
+        )
     builder.add_node("pass_run", pass_run)
     builder.add_node("fail_run", fail_run)
 
@@ -139,7 +163,12 @@ def build_agent_graph(
     builder.add_edge("fail_run", "classify_failure")
     builder.add_edge("report_bug", END)
 
-    execute_destination = "request_approval" if require_approval else "execute"
+    if require_approval:
+        execute_destination = "request_approval"
+    elif approval_policy_enabled:
+        execute_destination = "assess_action_risk"
+    else:
+        execute_destination = "execute"
 
     builder.add_conditional_edges(
         "plan",

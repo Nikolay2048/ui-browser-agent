@@ -30,14 +30,14 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 24: [Human-in-the-loop](learning/lesson_24_human_in_the_loop/README.md).
+Урок 25: [Policy-based approval](learning/lesson_25_approval_policy/README.md).
 
 Нужно:
 
-- остановить граф перед browser action через `interrupt()`;
-- провалидировать решение человека;
-- продолжить тот же thread через `Command(resume=...)`;
-- разделить approval и необратимый browser side effect.
+- оценивать риск BrowserAction детерминированной policy;
+- автоматически выполнять безопасные действия;
+- запрашивать человека только для рискованных действий;
+- сохранить решение policy в AgentState и LangSmith trace.
 
 После прохождения тестов:
 

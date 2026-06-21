@@ -10,7 +10,6 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
 from playwright.sync_api import sync_playwright
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
@@ -19,9 +18,11 @@ from browser_agent.browser import PlaywrightBrowser
 from browser_agent.graph import build_agent_graph
 from browser_agent.models import TestCase
 from browser_agent.persistence import build_thread_config
+
+
 def main() -> None:
     fixture_url = (
-        PROJECT_ROOT / "examples" / "playwright_fixture.html"
+            PROJECT_ROOT / "examples" / "playwright_fixture.html"
     ).resolve().as_uri()
 
     test_case = TestCase(
@@ -66,7 +67,7 @@ def main() -> None:
             model,
             browser,
             checkpointer=checkpointer,
-            require_approval=True,
+            approval_policy_enabled=True,
         )
 
         config = build_thread_config(test_case, thread_id)
@@ -123,6 +124,7 @@ def main() -> None:
 
         input("\nPress Enter to close Chromium...")
         chromium.close()
+
 
 if __name__ == "__main__":
     main()
