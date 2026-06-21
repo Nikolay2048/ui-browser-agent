@@ -6,6 +6,7 @@ learning/lesson_10_autonomous_loop/README.md.
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
+from browser_agent.approval import request_action_approval, reject_run, route_after_approval
 from browser_agent.classifier import make_classifier_node
 from browser_agent.executor import make_execute_node
 from browser_agent.judge import make_judge_node
@@ -99,6 +100,7 @@ def build_agent_graph(
         classifier_model=None,
         reporter_model=None,
         checkpointer=None,
+        require_approval: bool = False,
 ):
     """Compile the first autonomous observe-plan-act loop."""
     judge_model = judge_model or model
@@ -114,6 +116,19 @@ def build_agent_graph(
     builder.add_node("judge", make_judge_node(judge_model))
     builder.add_node("classify_failure", make_classifier_node(classifier_model))
     builder.add_node("report_bug", make_reporter_node(reporter_model))
+    if require_approval:
+        builder.add_node("request_approval", request_action_approval)
+        builder.add_node("reject_run", reject_run)
+
+        builder.add_conditional_edges(
+            "request_approval",
+            route_after_approval,
+            {
+                "execute": "execute",
+                "reject_run": "reject_run",
+            },
+        )
+        builder.add_edge("reject_run", END)
     builder.add_node("pass_run", pass_run)
     builder.add_node("fail_run", fail_run)
 
@@ -124,14 +139,15 @@ def build_agent_graph(
     builder.add_edge("fail_run", "classify_failure")
     builder.add_edge("report_bug", END)
 
+    execute_destination = "request_approval" if require_approval else "execute"
+
     builder.add_conditional_edges(
         "plan",
         route_planned_action,
         {
             "judge": "judge",
-            "execute": "execute"
-
-        }
+            "execute": execute_destination,
+        },
     )
     builder.add_conditional_edges(
         "judge",

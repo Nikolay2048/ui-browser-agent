@@ -30,14 +30,14 @@ src/browser_agent/graph.py
 
 ## Текущее задание
 
-Урок 23: [Checkpointing и thread_id](learning/lesson_23_checkpointing/README.md).
+Урок 24: [Human-in-the-loop](learning/lesson_24_human_in_the_loop/README.md).
 
 Нужно:
 
-- подключить LangGraph checkpointer;
-- связать историю состояния с `thread_id`;
-- научиться читать сохранённый StateSnapshot;
-- понять ограничения восстановления Playwright-сессии.
+- остановить граф перед browser action через `interrupt()`;
+- провалидировать решение человека;
+- продолжить тот же thread через `Command(resume=...)`;
+- разделить approval и необратимый browser side effect.
 
 После прохождения тестов:
 

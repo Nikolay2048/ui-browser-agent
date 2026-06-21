@@ -39,7 +39,8 @@
 | 20 | Bug Reporter | `completed.py` |
 | 21 | RunReport, JSON и Markdown | `completed.py` |
 | 22 | LangSmith observability | `completed.py` |
-| 23 | Checkpointing и thread_id | текущее задание в persistence, graph и runner |
+| 23 | Checkpointing и thread_id | `completed.py` |
+| 24 | Human-in-the-loop: interrupt и resume | текущее задание в approval и graph |
 
 ## Где писать новый код
 
@@ -52,21 +53,22 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 23 выполняется в:
+Текущее задание урока 24 выполняется в:
 
 ```text
-src/browser_agent/persistence.py
+src/browser_agent/models.py
+src/browser_agent/state.py
+src/browser_agent/approval.py
 src/browser_agent/graph.py
-src/browser_agent/runner.py
-scripts/run_real_agent.py
+scripts/run_agent_with_approval.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_persistence.py
-tests/test_graph_persistence.py
-tests/test_runner_persistence.py
+tests/test_approval_models.py
+tests/test_approval.py
+tests/test_approval_graph.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

@@ -7,7 +7,7 @@ Do not add LangGraph, LangChain, or Playwright code to this module.
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, field_validator
 
 
 class TestCase(BaseModel):
@@ -154,6 +154,7 @@ class TerminationKind(StrEnum):
     JUDGE_FAILED = "judge_failed"
     STEP_LIMIT = "step_limit"
     FAILURE_LIMIT = "failure_limit"
+    HUMAN_REJECTED = "human_rejected"
 
 
 class RunTermination(BaseModel):
@@ -226,3 +227,17 @@ class RunReport(BaseModel):
     verdict: JudgeVerdict | None = None
     classification: FailureClassification | None = None
     bug_report: BugReport | None = None
+
+
+class ActionApproval(BaseModel):
+    """Human decision about one proposed browser action."""
+
+    approved: bool
+    reason: str = Field(min_length=1)
+
+    @field_validator("reason")
+    @classmethod
+    def reason_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("reason must not be blank")
+        return value

@@ -6,6 +6,7 @@ from typing import TypedDict, NotRequired, Required, Literal
 
 from browser_agent.models import (
     ActionResult,
+    ActionApproval,
     BugReport,
     BrowserAction,
     ExecutionStep,
@@ -31,3 +32,4 @@ class AgentState(TypedDict):
     termination: NotRequired[RunTermination]
     classification: NotRequired[FailureClassification]
     bug_report: NotRequired[BugReport]
+    action_approval: NotRequired[ActionApproval]
