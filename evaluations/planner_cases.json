@@ -1,0 +1,72 @@
+[
+  {
+    "id": "fill-username",
+    "test_case": {
+      "id": "login",
+      "name": "Login",
+      "start_url": "https://example.com/login",
+      "goal": "Log in as the test user",
+      "test_data": {
+        "username": "standard_user"
+      },
+      "expected": [
+        "Products page is visible"
+      ]
+    },
+    "page_snapshot": "- textbox \"Username\"\n- button \"Login\"",
+    "expected_action": {
+      "action": "fill",
+      "target": {
+        "strategy": "label",
+        "value": "Username"
+      },
+      "value": "standard_user",
+      "reason": "Enter the username from test data."
+    }
+  },
+  {
+    "id": "click-login",
+    "test_case": {
+      "id": "login-submit",
+      "name": "Submit login",
+      "start_url": "https://example.com/login",
+      "goal": "Submit the completed login form",
+      "expected": [
+        "Products page is visible"
+      ]
+    },
+    "page_snapshot": "- textbox \"Username\": standard_user\n- textbox \"Password\": secret\n- button \"Login\"",
+    "expected_action": {
+      "action": "click",
+      "target": {
+        "strategy": "role",
+        "value": "button",
+        "name": "Login"
+      },
+      "value": null,
+      "reason": "Submit the completed form."
+    }
+  },
+  {
+    "id": "finish-visible-result",
+    "test_case": {
+      "id": "task-visible",
+      "name": "Task is visible",
+      "start_url": "https://example.com/tasks",
+      "goal": "Add task Learn AI Agents",
+      "test_data": {
+        "task": "Learn AI Agents"
+      },
+      "expected": [
+        "Learn AI Agents is visible"
+      ]
+    },
+    "page_snapshot": "- listitem \"Learn AI Agents\"",
+    "expected_action": {
+      "action": "finish",
+      "target": null,
+      "value": null,
+      "reason": "The requested task is visible."
+    }
+  }
+]
