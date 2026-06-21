@@ -77,8 +77,6 @@ def assess_action_risk(action: BrowserAction) -> ApprovalPolicyDecision:
         )
 
     if action.action == BrowserActionType.PRESS:
-        # Минимальная policy: press Enter считается risky.
-        # Обычно key лежит в action.text, action.value или action.key — зависит от модели.
         pressed_value = ""
         for attr in ("text", "value", "key"):
             value = getattr(action, attr, None)

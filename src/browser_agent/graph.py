@@ -102,7 +102,7 @@ def build_agent_graph(
         reporter_model=None,
         checkpointer=None,
         require_approval: bool = False,
-approval_policy_enabled: bool = False,
+        approval_policy_enabled: bool = False,
 ):
     """Compile the first autonomous observe-plan-act loop."""
     judge_model = judge_model or model
