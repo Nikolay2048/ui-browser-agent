@@ -1,64 +1,124 @@
-# Целевая архитектура
+# Архитектура Browser Testing Agent
+
+## Текущий workflow
 
 ```mermaid
 flowchart TD
-    A["TestCase"] --> B["Initialize"]
-    B --> C["Observe"]
-    C --> D["Planner"]
-    D --> E["Validate action"]
-    E -->|valid| F["Execute"]
-    E -->|invalid| G["Repair"]
-    F --> H["Observe result"]
-    H --> I["Judge"]
-    I -->|continue| C
-    I -->|retry| J["Recover"]
-    I -->|finish| K["Analyze findings"]
-    K --> L["Write report"]
+    S["TestCase"] --> I["initialize"]
+    I --> O["observe"]
+    O --> P["plan"]
+    P -->|"finish"| J["judge"]
+    P -->|"browser action"| R{"approval mode"}
+    R -->|"disabled"| E["execute"]
+    R -->|"all actions"| A["request_approval"]
+    R -->|"risk policy"| RP["assess_action_risk"]
+    RP -->|"safe"| E
+    RP -->|"risky"| A
+    A -->|"approved"| E
+    A -->|"rejected"| HR["reject_run"]
+    E -->|"continue"| O
+    E -->|"limits reached"| F["fail_run"]
+    J -->|"passed"| PASS["pass_run"]
+    J -->|"failed"| F
+    F --> C["classify_failure"]
+    C -->|"product bug"| B["report_bug"]
+    C -->|"other failure"| END["END"]
+    B --> END
+    HR --> END
+    PASS --> END
 ```
 
-## Границы ответственности
+## Слои
 
-### Domain models
+### Domain
 
-Описывают данные между компонентами. Не знают о LangGraph, Playwright и LLM.
+`models.py` содержит Pydantic-контракты. Модели не должны зависеть от
+LangGraph, Playwright, LangSmith или файловой системы.
 
-### Graph state
+### Agent roles
 
-Хранит состояние одного запуска: тест-кейс, snapshot, маршрут, ошибки и статус.
+- `planner.py` выбирает одно следующее действие;
+- `judge.py` проверяет expected results;
+- `classifier.py` объясняет failed run;
+- `reporter.py` создаёт структурированный `BugReport`.
 
-### Observer
+Каждая LLM-роль имеет отдельный prompt и structured output.
 
-Преобразует страницу в компактное текстовое представление для модели.
+### Deterministic policies
 
-### Planner
+- `approval_policy.py` решает, требуется ли human review;
+- routers в `graph.py` выбирают ветки;
+- Pydantic валидирует границы данных.
 
-Получает цель, snapshot и историю. Возвращает одно строго типизированное
-действие. Не управляет Playwright напрямую.
+Решения безопасности не должны зависеть только от LLM.
 
-### Validator
+### Browser infrastructure
 
-Детерминированно проверяет действие до исполнения: обязательные аргументы,
-разрешенный домен, повторения и опасные операции.
+- `browser.py` адаптирует Playwright к интерфейсу агента;
+- `observer.py` получает компактный snapshot;
+- `executor.py` является единственным слоем, выполняющим browser side effects.
 
-### Executor
+### Workflow
 
-Единственный компонент, работающий с Playwright `Page`. Возвращает
-`ActionResult`, но не решает, достигнута ли бизнес-цель.
+`graph.py` связывает роли, policies и tools. Ноды возвращают partial state
+updates, а routers не выполняют side effects.
 
-### Judge
+### Application
 
-Определяет переход графа: продолжить, повторить, завершить успешно, завершить с
-ошибкой или запросить человека.
+`runner.py` отвечает за composition:
 
-### Analyzer
+- открывает start URL;
+- компилирует и запускает граф;
+- подключает tracing/checkpointing;
+- сохраняет итоговый отчёт.
 
-Отделяет дефект продукта от ошибки агента, окружения или тестовых данных.
+### Output
 
-### Reporter
+- `reporting.py` преобразует final `AgentState` в `RunReport`;
+- `templates/run_report.md.j2` формирует Markdown;
+- JSON используется для программных интеграций.
 
-Записывает маршрут, findings, screenshots и trace.
+### Evaluation
 
-### Test generator
+`planner_evaluation.py` содержит dataset contracts, scorers и LangSmith adapter
+для component evaluation Planner. Evaluation не является частью production
+workflow и запускается отдельными scripts.
 
-Преобразует подтвержденный успешный маршрут в стабильный Playwright-тест и
-повторно запускает его.
+## Runtime data
+
+```text
+TestCase
+  -> AgentState
+  -> ExecutionStep[]
+  -> JudgeVerdict / RunTermination
+  -> FailureClassification / BugReport
+  -> RunReport
+```
+
+Разные механизмы хранения:
+
+```text
+AgentState  -> рабочая память одного выполнения
+checkpoint  -> снимки одного thread
+LangSmith   -> observability и experiments
+RunReport   -> итоговый пользовательский артефакт
+```
+
+## Production-направление
+
+По мере роста пакет следует разделить на подпакеты:
+
+```text
+browser_agent/
+├── domain/
+├── agents/
+├── workflow/
+├── infrastructure/
+├── application/
+├── reporting/
+└── evaluation/
+```
+
+Миграцию нужно делать по границам ответственности и сопровождать тестами.
+Перенос всех файлов одновременно не даёт пользовательской ценности и создаёт
+ненужный риск изменения импортов.

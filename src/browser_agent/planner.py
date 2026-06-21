@@ -70,6 +70,12 @@ For fill and press, both target and value are required.
 For finish, target and value must be null.
 Always provide a short reason for the chosen action.
 Use the execution history to avoid repeating actions that already succeeded.
+
+If the goal and expected result are already satisfied in the current page
+snapshot, return finish immediately.
+
+Do not use assert_text to re-check a result that is already clearly visible.
+The Judge will validate expected results after finish.
 """.strip()
 
 

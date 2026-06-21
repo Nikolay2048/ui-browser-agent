@@ -41,7 +41,8 @@
 | 22 | LangSmith observability | `completed.py` |
 | 23 | Checkpointing и thread_id | `completed.py` |
 | 24 | Human-in-the-loop: interrupt и resume | `completed.py` |
-| 25 | Policy-based approval | текущее задание в approval_policy и graph |
+| 25 | Policy-based approval | `completed.py` |
+| 26 | Evaluation Planner | текущее состояние в `planner_evaluation.py` и LangSmith dataset |
 
 ## Где писать новый код
 
@@ -54,21 +55,20 @@
 src/browser_agent/
 ```
 
-Текущее задание урока 25 выполняется в:
+Текущий код урока 26 находится в:
 
 ```text
-src/browser_agent/models.py
-src/browser_agent/state.py
-src/browser_agent/approval_policy.py
-src/browser_agent/graph.py
-scripts/run_agent_with_approval.py
+src/browser_agent/planner_evaluation.py
+evaluations/planner_cases.json
+scripts/evaluate_planner.py
+scripts/upload_planner_dataset.py
+scripts/run_planner_experiment.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_approval_policy.py
-tests/test_approval_policy_graph.py
+tests/test_planner_evaluation.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

@@ -3,57 +3,106 @@
 Учебный проект по разработке агентной системы для автоматического тестирования
 веб-сайтов.
 
-## Где работать
+Система принимает `TestCase`, управляет браузером через Playwright, сохраняет
+маршрут выполнения, проверяет ожидаемые результаты, классифицирует сбои и
+формирует отчёт о запуске.
+
+## Архитектура
 
 Актуальный код:
 
 ```text
 src/browser_agent/
-├── models.py
-├── state.py
-├── planner.py
-├── observer.py
-├── executor.py
-├── browser.py
-├── graph.py
-└── runner.py
+├── models.py              # Pydantic-контракты
+├── state.py               # AgentState
+├── graph.py               # LangGraph workflow
+├── runner.py              # composition layer
+├── planner.py             # выбор следующего действия
+├── observer.py            # получение page snapshot
+├── executor.py            # выполнение BrowserAction
+├── browser.py             # Playwright adapter
+├── judge.py               # проверка expected results
+├── classifier.py          # классификация failed run
+├── reporter.py            # создание BugReport
+├── reporting.py           # RunReport, JSON и Markdown
+├── approval.py            # interrupt/resume
+├── approval_policy.py     # детерминированная risk policy
+├── persistence.py         # thread config
+├── observability.py       # LangSmith config
+└── planner_evaluation.py  # component evaluation Planner
 ```
 
-В каждый момент развивается только один граф:
+Подробная схема: [docs/architecture.md](docs/architecture.md).
 
-```text
-src/browser_agent/graph.py
-```
+## Основные команды
 
-Завершенные учебные этапы находятся в [`learning/`](learning/README.md). Их не
-нужно изменять при выполнении новых заданий.
-
-## Текущее задание
-
-Урок 25: [Policy-based approval](learning/lesson_25_approval_policy/README.md).
-
-Нужно:
-
-- оценивать риск BrowserAction детерминированной policy;
-- автоматически выполнять безопасные действия;
-- запрашивать человека только для рискованных действий;
-- сохранить решение policy в AgentState и LangSmith trace.
-
-После прохождения тестов:
+Установка проекта:
 
 ```powershell
-python scripts\run_real_agent.py
+python -m pip install -e ".[dev]"
+playwright install chromium
 ```
 
-## Проверка
-
-Только актуальный агент:
+Unit и integration tests:
 
 ```powershell
 python -m pytest -q
 ```
 
-Тесты прошлых уроков по умолчанию не запускаются.
+Реальный автономный агент:
+
+```powershell
+python scripts\run_real_agent.py
+```
+
+Агент с human approval:
+
+```powershell
+python scripts\run_agent_with_approval.py
+```
+
+Локальная evaluation Planner:
+
+```powershell
+python scripts\evaluate_planner.py
+```
+
+LangSmith experiment:
+
+```powershell
+python scripts\run_planner_experiment.py
+```
+
+## Конфигурация
+
+Локальные значения хранятся в `.env`, который не добавляется в Git.
+Поддерживаемые переменные приведены в [.env.example](.env.example).
+
+Минимальный набор:
+
+```text
+OLLAMA_MODEL=qwen3.5:35b
+LANGSMITH_API_KEY=...
+LANGSMITH_TRACING=true
+LANGSMITH_PROJECT=ui-browser-agent-dev
+```
+
+## Текущий этап
+
+Урок 26 завершён: [Evaluation Planner](learning/lesson_26_planner_evaluation/README.md).
+
+Реализовано:
+
+- локальный dataset Planner;
+- component-level scorers;
+- агрегированные accuracy-метрики;
+- LangSmith target, evaluator и experiment;
+- сравнение версий prompt по фиксированному dataset.
+
+Следующий этап — Evaluation Judge.
+
+Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
+файлы не импортируются рабочим приложением и не входят в основной `pytest`.
 
 ## Стек
 
@@ -61,4 +110,6 @@ python -m pytest -q
 - LangChain — prompt, LLM и structured output;
 - LangGraph — состояние, переходы и цикл;
 - Playwright — управление настоящим браузером;
-- Ollama `qwen3.5:35b` — локальная модель.
+- Ollama `qwen3.5:35b` — локальная модель;
+- LangSmith — traces, datasets и evaluation experiments;
+- Jinja2 — Markdown-шаблон итогового отчёта.
