@@ -16,10 +16,9 @@ class EndToEndModel:
 
     def with_structured_output(self, schema):
         def respond(prompt_value):
-            prompt = "\n".join(
-                str(message.content)
-                for message in prompt_value.to_messages()
-            )
+            messages = prompt_value.to_messages()
+
+            current_context = str(messages[-1].content)
 
             if schema is JudgeVerdict:
                 return JudgeVerdict(
@@ -43,7 +42,7 @@ class EndToEndModel:
                     should_create_bug=False,
                 )
 
-            return self._plan(prompt)
+            return self._plan(current_context)
 
         return RunnableLambda(respond)
 
