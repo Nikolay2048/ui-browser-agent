@@ -1,6 +1,4 @@
-import browser_agent.models as legacy_models
-import browser_agent.planner_evaluation as legacy_planner_evaluation
-import browser_agent.judge_evaluation as legacy_judge_evaluation
+from importlib.util import find_spec
 
 from browser_agent.domain import TestCase as DomainTestCase
 from browser_agent.domain.models import BrowserAction
@@ -17,11 +15,8 @@ def test_domain_models_are_owned_by_domain_package() -> None:
     assert BrowserAction.__module__ == "browser_agent.domain.models"
 
 
-def test_legacy_model_imports_keep_same_class_identity() -> None:
-    from browser_agent.domain.models import TestCase as DomainTestCase
-
-    assert legacy_models.TestCase is DomainTestCase
-    assert legacy_models.BrowserAction is BrowserAction
+def test_legacy_model_module_is_removed() -> None:
+    assert find_spec("browser_agent.models") is None
 
 
 def test_evaluation_implementations_are_owned_by_evaluation_package() -> None:
@@ -35,15 +30,9 @@ def test_evaluation_implementations_are_owned_by_evaluation_package() -> None:
     )
 
 
-def test_legacy_evaluation_imports_keep_function_identity() -> None:
-    assert (
-        legacy_planner_evaluation.score_planner_action
-        is score_planner_action
-    )
-    assert (
-        legacy_judge_evaluation.score_judge_verdict
-        is score_judge_verdict
-    )
+def test_legacy_evaluation_modules_are_removed() -> None:
+    assert find_spec("browser_agent.planner_evaluation") is None
+    assert find_spec("browser_agent.judge_evaluation") is None
 
 
 def test_package_initializers_expose_intentional_public_api() -> None:

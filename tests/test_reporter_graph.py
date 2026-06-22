@@ -1,5 +1,5 @@
 from browser_agent.graph import build_agent_graph, route_after_classification
-from browser_agent.models import FailureClassification
+from browser_agent.domain import FailureClassification
 
 
 def make_classification(should_create_bug: bool) -> FailureClassification:

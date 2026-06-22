@@ -2,7 +2,7 @@
 
 from langchain_ollama import ChatOllama
 
-from browser_agent.models import TestCase
+from browser_agent.domain import TestCase
 from browser_agent.planner import plan_next_action
 
 model = ChatOllama(

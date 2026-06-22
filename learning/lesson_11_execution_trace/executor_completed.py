@@ -1,7 +1,7 @@
 """Executor node completed in lesson 11."""
 
 from browser_agent.executor import execute_action
-from browser_agent.models import ExecutionStep
+from browser_agent.domain import ExecutionStep
 from browser_agent.state import AgentState
 
 

@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from browser_agent.models import BrowserTarget, BrowserTargetStrategy
+from browser_agent.domain import BrowserTarget, BrowserTargetStrategy
 
 
 def test_label_target_renders_locator_string() -> None:

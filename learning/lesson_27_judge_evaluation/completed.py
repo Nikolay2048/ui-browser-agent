@@ -1,6 +1,6 @@
 """Key Judge evaluation contracts completed in lesson 27."""
 
-from browser_agent.judge_evaluation import (
+from browser_agent.evaluation.judge import (
     JudgeEvaluationCase,
     JudgeEvaluationSummary,
     JudgePredictionScore,

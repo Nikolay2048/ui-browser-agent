@@ -2,7 +2,7 @@ from langchain_core.runnables import RunnableLambda
 
 from browser_agent.executor import make_execute_node
 from browser_agent.graph import build_agent_graph, initialize, route_after_execution
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserAction,
     BrowserTarget,

@@ -1,6 +1,6 @@
 import pytest
 
-from browser_agent.models import TestCase as AgentTestCase
+from browser_agent.domain import TestCase as AgentTestCase
 from browser_agent.persistence import build_thread_config
 
 

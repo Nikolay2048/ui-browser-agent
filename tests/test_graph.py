@@ -5,7 +5,7 @@ from browser_agent.graph import (
     route_after_execution,
     route_planned_action,
 )
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserAction,
     BrowserTarget,

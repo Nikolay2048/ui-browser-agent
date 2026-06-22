@@ -1,4 +1,4 @@
-from browser_agent.models import TestCase as AgentTestCase
+from browser_agent.domain import TestCase as AgentTestCase
 from browser_agent.routing_graph import (
     build_routing_graph,
     fail_run,

@@ -45,6 +45,7 @@
 | 26 | Evaluation Planner | `completed.py` |
 | 27 | Evaluation Judge | `completed.py` |
 | 28 | Production package architecture | `completed.py` |
+| 29 | End-to-end evaluation | текущее задание в `evaluation/end_to_end.py` |
 
 ## Где писать новый код
 
@@ -57,20 +58,17 @@
 src/browser_agent/
 ```
 
-Результат урока 28 находится в:
+Текущий код урока 29 находится в:
 
 ```text
-src/browser_agent/domain/
-src/browser_agent/evaluation/
-src/browser_agent/models.py
-src/browser_agent/planner_evaluation.py
-src/browser_agent/judge_evaluation.py
+src/browser_agent/evaluation/end_to_end.py
+evaluations/end_to_end_cases.json
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_package_architecture.py
+tests/test_end_to_end_evaluation.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

@@ -1,5 +1,16 @@
 """Offline evaluation utilities."""
 
+from browser_agent.evaluation.end_to_end import (
+    EndToEndEvaluationCase,
+    EndToEndEvaluationSummary,
+    EndToEndExpectation,
+    EndToEndRunScore,
+    end_to_end_evaluator,
+    evaluate_end_to_end_case,
+    make_end_to_end_target,
+    score_agent_run,
+    summarize_agent_runs,
+)
 from browser_agent.evaluation.judge import (
     JudgeEvaluationCase,
     JudgeEvaluationSummary,
@@ -23,6 +34,10 @@ from browser_agent.evaluation.planner import (
 )
 
 __all__ = [
+    "EndToEndEvaluationCase",
+    "EndToEndEvaluationSummary",
+    "EndToEndExpectation",
+    "EndToEndRunScore",
     "JudgeEvaluationCase",
     "JudgeEvaluationSummary",
     "JudgePredictionScore",
@@ -30,14 +45,19 @@ __all__ = [
     "PlannerEvaluationCase",
     "PlannerEvaluationSummary",
     "evaluate_judge_case",
+    "evaluate_end_to_end_case",
     "evaluate_planner_case",
     "judge_correctness_evaluator",
     "judge_false_positive_evaluator",
     "make_judge_target",
+    "make_end_to_end_target",
     "make_planner_target",
     "planner_action_evaluator",
     "score_judge_verdict",
+    "score_agent_run",
     "score_planner_action",
     "summarize_judge_scores",
+    "summarize_agent_runs",
     "summarize_planner_scores",
+    "end_to_end_evaluator",
 ]

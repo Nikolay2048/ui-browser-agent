@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from browser_agent.models import ActionResult, BrowserAction, TestCase
+from browser_agent.domain import ActionResult, BrowserAction, TestCase
 
 
 def test_valid_test_case() -> None:

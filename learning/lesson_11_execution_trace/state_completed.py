@@ -2,7 +2,7 @@
 
 from typing import NotRequired, Required, TypedDict
 
-from browser_agent.models import ExecutionStep, TestCase
+from browser_agent.domain import ExecutionStep, TestCase
 
 
 class AgentState(TypedDict):

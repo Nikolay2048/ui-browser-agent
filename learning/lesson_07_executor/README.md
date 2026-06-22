@@ -222,7 +222,7 @@ Screenshot нужен и после успеха, и после ошибки.
 Импортируйте:
 
 ```python
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserAction,
     BrowserActionType,

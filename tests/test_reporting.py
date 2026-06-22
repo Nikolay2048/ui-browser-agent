@@ -1,6 +1,6 @@
 import json
 
-from browser_agent.models import (
+from browser_agent.domain import (
     RunTermination,
     TerminationKind,
     TestCase as AgentTestCase,

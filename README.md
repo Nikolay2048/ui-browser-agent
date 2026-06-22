@@ -13,9 +13,8 @@
 
 ```text
 src/browser_agent/
-├── domain/                # новый public API доменных контрактов
-├── evaluation/            # новый public API offline evaluation
-├── models.py              # временный compatibility path
+├── domain/                # public API доменных контрактов
+├── evaluation/            # component и end-to-end evaluation
 ├── state.py               # AgentState
 ├── graph.py               # LangGraph workflow
 ├── runner.py              # composition layer
@@ -30,9 +29,7 @@ src/browser_agent/
 ├── approval.py            # interrupt/resume
 ├── approval_policy.py     # детерминированная risk policy
 ├── persistence.py         # thread config
-├── observability.py       # LangSmith config
-├── planner_evaluation.py  # compatibility path
-└── judge_evaluation.py    # compatibility path
+└── observability.py       # LangSmith config
 ```
 
 Подробная схема: [docs/architecture.md](docs/architecture.md).
@@ -76,10 +73,11 @@ python scripts\evaluate_planner.py
 python scripts\evaluate_judge.py
 ```
 
-LangSmith experiment:
+LangSmith experiments:
 
 ```powershell
 python scripts\run_planner_experiment.py
+python scripts\run_judge_experiment.py
 ```
 
 ## Конфигурация
@@ -98,18 +96,14 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Урок 28 завершён: [Production package architecture](learning/lesson_28_package_architecture/README.md).
+Текущий урок 29: [End-to-end evaluation](learning/lesson_29_end_to_end_evaluation/README.md).
 
-Реализовано:
+Нужно:
 
-- `domain` стал source of truth для Pydantic-контрактов;
-- `evaluation` владеет Planner/Judge evaluation;
-- старые import paths сохранены через compatibility shims;
-- production-код и scripts используют новые public API;
-- удалены устаревшие `src/main.py` и `src/graph.png`;
-- identity типов и функций защищена архитектурными тестами.
-
-Следующий этап — end-to-end evaluation полного агента.
+- оценить полный запуск, а не отдельную LLM-роль;
+- измерить status, termination, step budget и recovery;
+- отделить execution harness от scorer-а;
+- подготовить compact LangSmith target полного агента.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.

@@ -5,7 +5,7 @@ from browser_agent.judge import (
     judge_run,
     make_judge_node,
 )
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserAction,
     BrowserTarget,

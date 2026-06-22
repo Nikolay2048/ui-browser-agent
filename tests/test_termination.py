@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from browser_agent.graph import fail_run, pass_run
-from browser_agent.models import (
+from browser_agent.domain import (
     ExpectedResultCheck,
     JudgeVerdict,
     RunTermination,

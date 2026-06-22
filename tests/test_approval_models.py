@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from browser_agent.models import ActionApproval
+from browser_agent.domain import ActionApproval
 
 
 def test_action_approval_accepts_explicit_decision() -> None:

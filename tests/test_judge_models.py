@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from browser_agent.models import ExpectedResultCheck, JudgeVerdict
+from browser_agent.domain import ExpectedResultCheck, JudgeVerdict
 
 
 def test_judge_verdict_contains_checks_and_summary() -> None:

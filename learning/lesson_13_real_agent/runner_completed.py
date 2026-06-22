@@ -3,7 +3,7 @@
 from collections.abc import Callable
 
 from browser_agent.graph import build_agent_graph
-from browser_agent.models import TestCase
+from browser_agent.domain import TestCase
 
 
 def run_agent(

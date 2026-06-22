@@ -1,6 +1,6 @@
 from langchain_core.runnables import RunnableLambda
 
-from browser_agent.models import BrowserAction, TestCase as AgentTestCase
+from browser_agent.domain import BrowserAction, TestCase as AgentTestCase
 from browser_agent.observing_agent_graph import build_observing_agent_graph
 
 

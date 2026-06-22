@@ -329,7 +329,7 @@ src/browser_agent/browser.py
 Импортируй:
 
 ```python
-from browser_agent.models import BrowserTarget, BrowserTargetStrategy
+from browser_agent.domain import BrowserTarget, BrowserTargetStrategy
 ```
 
 Измени:

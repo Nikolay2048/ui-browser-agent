@@ -32,7 +32,7 @@ flowchart TD
 
 ### Domain
 
-`models.py` содержит Pydantic-контракты. Модели не должны зависеть от
+`domain/models.py` содержит Pydantic-контракты. Модели не должны зависеть от
 LangGraph, Playwright, LangSmith или файловой системы.
 
 ### Agent roles
@@ -80,9 +80,14 @@ updates, а routers не выполняют side effects.
 
 ### Evaluation
 
-`planner_evaluation.py` содержит dataset contracts, scorers и LangSmith adapter
-для component evaluation Planner. Evaluation не является частью production
-workflow и запускается отдельными scripts.
+`evaluation/` содержит:
+
+- component evaluation Planner;
+- component evaluation Judge;
+- end-to-end evaluation полного запуска.
+
+Evaluation не является частью production workflow и запускается отдельными
+tests/scripts/experiments.
 
 ## Runtime data
 
@@ -106,7 +111,7 @@ RunReport   -> итоговый пользовательский артефак�
 
 ## Production-направление
 
-Первая часть миграции уже выполнена:
+Первая часть миграции выполнена:
 
 ```text
 browser_agent/
@@ -114,8 +119,15 @@ browser_agent/
 └── evaluation/
 ```
 
-Старые пути `browser_agent.models`, `browser_agent.planner_evaluation` и
-`browser_agent.judge_evaluation` временно сохранены как compatibility shims.
+Старые модули `browser_agent.models`, `browser_agent.planner_evaluation` и
+`browser_agent.judge_evaluation` удалены после перевода всех consumers на новые
+public API:
+
+```python
+from browser_agent.domain import TestCase
+from browser_agent.evaluation.planner import PlannerEvaluationCase
+from browser_agent.evaluation.judge import JudgeEvaluationCase
+```
 
 Следующие подпакеты будут выделяться только при практической необходимости:
 
@@ -128,4 +140,4 @@ reporting/
 ```
 
 Миграция выполняется по одной границе ответственности и сопровождается тестами
-identity и обратной совместимости.
+ownership, public API и отсутствия устаревших модулей.

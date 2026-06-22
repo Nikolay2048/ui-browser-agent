@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from browser_agent.browser import PlaywrightBrowser
-from browser_agent.models import BrowserTarget
+from browser_agent.domain import BrowserTarget
 
 
 class FakeLocator:

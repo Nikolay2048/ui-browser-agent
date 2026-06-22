@@ -1,7 +1,7 @@
 from langchain_core.runnables import RunnableLambda
 
 from browser_agent.agent_graph import build_agent_graph
-from browser_agent.models import BrowserAction, TestCase as AgentTestCase
+from browser_agent.domain import BrowserAction, TestCase as AgentTestCase
 
 
 class FakeStructuredModel:

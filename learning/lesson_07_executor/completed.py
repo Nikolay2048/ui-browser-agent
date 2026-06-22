@@ -1,6 +1,6 @@
 """Completed deterministic executor after lesson 7."""
 
-from browser_agent.models import ActionResult, BrowserActionType
+from browser_agent.domain import ActionResult, BrowserActionType
 from browser_agent.state import AgentState
 
 

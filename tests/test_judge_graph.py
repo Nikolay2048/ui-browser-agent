@@ -1,5 +1,5 @@
 from browser_agent.graph import route_after_judge, route_planned_action
-from browser_agent.models import (
+from browser_agent.domain import (
     BrowserAction,
     ExpectedResultCheck,
     JudgeVerdict,

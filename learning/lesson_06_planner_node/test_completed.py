@@ -1,6 +1,6 @@
 from langchain_core.runnables import RunnableLambda
 
-from browser_agent.models import BrowserAction, TestCase as AgentTestCase
+from browser_agent.domain import BrowserAction, TestCase as AgentTestCase
 from browser_agent.planner_graph import build_planner_graph, make_plan_node
 
 

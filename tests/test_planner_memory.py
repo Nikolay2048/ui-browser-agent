@@ -1,6 +1,6 @@
 from langchain_core.runnables import RunnableLambda
 
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserAction,
     BrowserTarget,

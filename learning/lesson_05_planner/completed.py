@@ -2,7 +2,7 @@
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from browser_agent.models import BrowserAction
+from browser_agent.domain import BrowserAction
 
 SYSTEM_PROMPT = """
 You are a browser testing planner.

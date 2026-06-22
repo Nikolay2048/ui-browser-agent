@@ -1,6 +1,6 @@
 """Planner memory completed in lesson 14."""
 
-from browser_agent.models import ExecutionStep
+from browser_agent.domain import ExecutionStep
 
 
 def format_execution_history(route: list[ExecutionStep]) -> str:

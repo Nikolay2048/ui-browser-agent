@@ -1,7 +1,7 @@
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
-from browser_agent.models import TestCase as AgentTestCase
+from browser_agent.domain import TestCase as AgentTestCase
 from browser_agent.runner import run_agent
 
 

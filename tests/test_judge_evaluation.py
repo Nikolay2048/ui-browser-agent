@@ -1,7 +1,7 @@
 import pytest
 from langchain_core.runnables import RunnableLambda
 
-from browser_agent.judge_evaluation import (
+from browser_agent.evaluation.judge import (
     JudgeEvaluationCase,
     JudgePredictionScore,
     evaluate_judge_case,
@@ -11,7 +11,7 @@ from browser_agent.judge_evaluation import (
     score_judge_verdict,
     summarize_judge_scores,
 )
-from browser_agent.models import (
+from browser_agent.domain import (
     ExpectedResultCheck,
     JudgeVerdict,
     TestCase as AgentTestCase,

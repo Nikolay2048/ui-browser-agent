@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from browser_agent.executor import make_execute_node
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserAction,
     BrowserTarget,

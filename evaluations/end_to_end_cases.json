@@ -1,0 +1,65 @@
+[
+  {
+    "id": "create-task-happy-path",
+    "test_case": {
+      "id": "e2e-create-task",
+      "name": "Create task",
+      "start_url": "https://example.com/tasks",
+      "goal": "Add task Learn AI Agents",
+      "test_data": {
+        "task": "Learn AI Agents"
+      },
+      "expected": [
+        "Learn AI Agents is visible"
+      ],
+      "max_steps": 5,
+      "max_failures": 2
+    },
+    "expected": {
+      "status": "passed",
+      "max_steps": 2,
+      "termination_kind": "judge_passed",
+      "expects_recovery": false
+    }
+  },
+  {
+    "id": "recover-after-first-action",
+    "test_case": {
+      "id": "e2e-recovery",
+      "name": "Recover from blocked primary action",
+      "start_url": "https://example.com/start",
+      "goal": "Reach Done",
+      "expected": [
+        "Done is visible"
+      ],
+      "max_steps": 5,
+      "max_failures": 2
+    },
+    "expected": {
+      "status": "passed",
+      "max_steps": 2,
+      "termination_kind": "judge_passed",
+      "expects_recovery": true
+    }
+  },
+  {
+    "id": "failure-budget-exhausted",
+    "test_case": {
+      "id": "e2e-failure-limit",
+      "name": "Stop after repeated browser failures",
+      "start_url": "https://example.com/broken",
+      "goal": "Submit the form",
+      "expected": [
+        "Success message is visible"
+      ],
+      "max_steps": 5,
+      "max_failures": 2
+    },
+    "expected": {
+      "status": "failed",
+      "max_steps": 2,
+      "termination_kind": "failure_limit",
+      "expects_recovery": false
+    }
+  }
+]

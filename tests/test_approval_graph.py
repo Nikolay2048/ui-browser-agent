@@ -3,7 +3,7 @@ from langgraph.types import Command
 from langchain_core.runnables import RunnableLambda
 
 from browser_agent.graph import build_agent_graph
-from browser_agent.models import (
+from browser_agent.domain import (
     BrowserAction,
     BrowserTarget,
     BrowserTargetStrategy,

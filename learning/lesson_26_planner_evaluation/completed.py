@@ -1,6 +1,6 @@
 """Key Planner evaluation contracts completed in lesson 26."""
 
-from browser_agent.planner_evaluation import (
+from browser_agent.evaluation.planner import (
     PlannerActionScore,
     PlannerEvaluationCase,
     PlannerEvaluationSummary,

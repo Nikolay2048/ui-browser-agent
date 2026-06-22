@@ -5,7 +5,7 @@ from browser_agent.approval_policy import (
     make_assess_action_node,
     route_after_risk_assessment,
 )
-from browser_agent.models import ApprovalPolicyDecision
+from browser_agent.domain import ApprovalPolicyDecision
 
 __all__ = [
     "ApprovalPolicyDecision",

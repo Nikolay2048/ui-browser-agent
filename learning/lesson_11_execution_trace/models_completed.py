@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field
 
-from browser_agent.models import ActionResult, BrowserAction
+from browser_agent.domain import ActionResult, BrowserAction
 
 
 class ExecutionStep(BaseModel):

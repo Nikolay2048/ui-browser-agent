@@ -5,7 +5,7 @@ from browser_agent.classifier import (
     classify_failure,
     make_classifier_node,
 )
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserAction,
     BrowserTarget,

@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from browser_agent.models import FailureCategory, FailureClassification
+from browser_agent.domain import FailureCategory, FailureClassification
 
 
 def test_product_bug_classification_can_recommend_bug_report() -> None:

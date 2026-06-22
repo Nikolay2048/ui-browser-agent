@@ -4,7 +4,7 @@ from browser_agent.loop_graph import (
     perform_step,
     route_after_step,
 )
-from browser_agent.models import TestCase as AgentTestCase
+from browser_agent.domain import TestCase as AgentTestCase
 
 
 def make_state(step_count: int, max_steps: int = 3) -> dict:

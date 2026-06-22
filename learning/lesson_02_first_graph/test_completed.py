@@ -1,5 +1,5 @@
 from browser_agent.graph import build_learning_graph, complete, initialize
-from browser_agent.models import TestCase as AgentTestCase
+from browser_agent.domain import TestCase as AgentTestCase
 
 
 def make_case() -> AgentTestCase:

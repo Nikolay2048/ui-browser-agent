@@ -1,10 +1,10 @@
 from langchain_core.runnables import RunnableLambda
 
-from browser_agent.models import (
+from browser_agent.domain import (
     BrowserAction,
     BrowserTarget,
 )
-from browser_agent.planner_evaluation import (
+from browser_agent.evaluation.planner import (
     PlannerActionScore,
     PlannerEvaluationCase,
     evaluate_planner_case,
@@ -13,7 +13,7 @@ from browser_agent.planner_evaluation import (
     score_planner_action,
     summarize_planner_scores,
 )
-from browser_agent.models import TestCase as AgentTestCase
+from browser_agent.domain import TestCase as AgentTestCase
 
 
 def fill_action(

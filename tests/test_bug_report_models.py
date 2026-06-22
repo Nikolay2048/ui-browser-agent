@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from browser_agent.models import BugReport, BugSeverity
+from browser_agent.domain import BugReport, BugSeverity
 
 
 def make_payload() -> dict:

@@ -1,5 +1,5 @@
 from browser_agent.executor import execute_action, make_execute_node
-from browser_agent.models import BrowserAction
+from browser_agent.domain import BrowserAction
 
 
 class FakeBrowser:

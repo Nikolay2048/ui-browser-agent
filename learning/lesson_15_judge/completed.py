@@ -1,6 +1,6 @@
 """Lesson 15 summary: finish is routed to Judge before pass/fail."""
 
-from browser_agent.models import ExpectedResultCheck, JudgeVerdict
+from browser_agent.domain import ExpectedResultCheck, JudgeVerdict
 
 
 def route_after_judge(state) -> str:

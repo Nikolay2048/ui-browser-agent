@@ -6,7 +6,7 @@ from browser_agent.approval import (
     request_action_approval,
     route_after_approval,
 )
-from browser_agent.models import ActionApproval
+from browser_agent.domain import ActionApproval
 
 __all__ = [
     "ActionApproval",

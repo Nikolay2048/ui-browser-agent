@@ -4,7 +4,7 @@ from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
 from browser_agent.executor import make_execute_node
-from browser_agent.models import BrowserActionType
+from browser_agent.domain import BrowserActionType
 from browser_agent.observer import make_observe_node
 from browser_agent.planner import make_plan_node
 from browser_agent.state import AgentState
