@@ -42,7 +42,8 @@
 | 23 | Checkpointing и thread_id | `completed.py` |
 | 24 | Human-in-the-loop: interrupt и resume | `completed.py` |
 | 25 | Policy-based approval | `completed.py` |
-| 26 | Evaluation Planner | текущее состояние в `planner_evaluation.py` и LangSmith dataset |
+| 26 | Evaluation Planner | `completed.py` |
+| 27 | Evaluation Judge | текущее задание в `judge_evaluation.py` |
 
 ## Где писать новый код
 
@@ -55,20 +56,18 @@
 src/browser_agent/
 ```
 
-Текущий код урока 26 находится в:
+Текущий код урока 27 находится в:
 
 ```text
-src/browser_agent/planner_evaluation.py
-evaluations/planner_cases.json
-scripts/evaluate_planner.py
-scripts/upload_planner_dataset.py
-scripts/run_planner_experiment.py
+src/browser_agent/judge_evaluation.py
+evaluations/judge_cases.json
+scripts/evaluate_judge.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_planner_evaluation.py
+tests/test_judge_evaluation.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

@@ -29,7 +29,8 @@ src/browser_agent/
 ├── approval_policy.py     # детерминированная risk policy
 ├── persistence.py         # thread config
 ├── observability.py       # LangSmith config
-└── planner_evaluation.py  # component evaluation Planner
+├── planner_evaluation.py  # component evaluation Planner
+└── judge_evaluation.py    # component evaluation Judge
 ```
 
 Подробная схема: [docs/architecture.md](docs/architecture.md).
@@ -67,6 +68,12 @@ python scripts\run_agent_with_approval.py
 python scripts\evaluate_planner.py
 ```
 
+Локальная evaluation Judge:
+
+```powershell
+python scripts\evaluate_judge.py
+```
+
 LangSmith experiment:
 
 ```powershell
@@ -89,17 +96,14 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Урок 26 завершён: [Evaluation Planner](learning/lesson_26_planner_evaluation/README.md).
+Текущий урок 27: [Evaluation Judge](learning/lesson_27_judge_evaluation/README.md).
 
-Реализовано:
+Нужно:
 
-- локальный dataset Planner;
-- component-level scorers;
-- агрегированные accuracy-метрики;
-- LangSmith target, evaluator и experiment;
-- сравнение версий prompt по фиксированному dataset.
-
-Следующий этап — Evaluation Judge.
+- создать Judge dataset с pass/fail labels;
+- построить confusion matrix;
+- измерить accuracy, precision, recall, FPR и FNR;
+- отдельно отслеживать опасные false positive в LangSmith.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.

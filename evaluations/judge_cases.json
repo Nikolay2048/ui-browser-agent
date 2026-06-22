@@ -1,0 +1,58 @@
+[
+  {
+    "id": "task-visible-pass",
+    "test_case": {
+      "id": "judge-task-visible",
+      "name": "Task is visible",
+      "start_url": "https://example.com/tasks",
+      "goal": "Verify the created task",
+      "expected": [
+        "Learn AI Agents is visible"
+      ]
+    },
+    "page_snapshot": "- listitem \"Learn AI Agents\"",
+    "expected_passed": true
+  },
+  {
+    "id": "task-missing-fail",
+    "test_case": {
+      "id": "judge-task-missing",
+      "name": "Task is missing",
+      "start_url": "https://example.com/tasks",
+      "goal": "Verify the created task",
+      "expected": [
+        "Learn AI Agents is visible"
+      ]
+    },
+    "page_snapshot": "- listitem \"Buy milk\"",
+    "expected_passed": false
+  },
+  {
+    "id": "success-message-pass",
+    "test_case": {
+      "id": "judge-success-message",
+      "name": "Success message",
+      "start_url": "https://example.com/profile",
+      "goal": "Save the profile",
+      "expected": [
+        "Profile saved message is visible"
+      ]
+    },
+    "page_snapshot": "- status \"Profile saved\"",
+    "expected_passed": true
+  },
+  {
+    "id": "ambiguous-spinner-fail",
+    "test_case": {
+      "id": "judge-ambiguous",
+      "name": "Ambiguous loading state",
+      "start_url": "https://example.com/checkout",
+      "goal": "Complete checkout",
+      "expected": [
+        "Order confirmation number is visible"
+      ]
+    },
+    "page_snapshot": "- status \"Processing order...\"\n- progressbar",
+    "expected_passed": false
+  }
+]
