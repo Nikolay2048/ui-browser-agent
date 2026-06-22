@@ -10,7 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from browser_agent.planner_evaluation import PlannerEvaluationCase
+from browser_agent.evaluation.planner import PlannerEvaluationCase
 
 
 DATASET_NAME = "ui-browser-agent-planner-v1"

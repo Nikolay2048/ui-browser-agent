@@ -43,7 +43,8 @@
 | 24 | Human-in-the-loop: interrupt и resume | `completed.py` |
 | 25 | Policy-based approval | `completed.py` |
 | 26 | Evaluation Planner | `completed.py` |
-| 27 | Evaluation Judge | текущее задание в `judge_evaluation.py` |
+| 27 | Evaluation Judge | `completed.py` |
+| 28 | Production package architecture | `completed.py` |
 
 ## Где писать новый код
 
@@ -56,18 +57,20 @@
 src/browser_agent/
 ```
 
-Текущий код урока 27 находится в:
+Результат урока 28 находится в:
 
 ```text
+src/browser_agent/domain/
+src/browser_agent/evaluation/
+src/browser_agent/models.py
+src/browser_agent/planner_evaluation.py
 src/browser_agent/judge_evaluation.py
-evaluations/judge_cases.json
-scripts/evaluate_judge.py
 ```
 
 Основные тесты задания находятся в:
 
 ```text
-tests/test_judge_evaluation.py
+tests/test_package_architecture.py
 ```
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.

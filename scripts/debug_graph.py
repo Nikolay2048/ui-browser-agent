@@ -10,7 +10,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from langchain_core.runnables import RunnableLambda
 
 from browser_agent.graph import build_agent_graph
-from browser_agent.models import BrowserAction, BrowserTarget, TestCase
+from browser_agent.domain import BrowserAction, BrowserTarget, TestCase
 
 
 class DebugModel:

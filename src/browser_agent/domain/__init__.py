@@ -1,7 +1,4 @@
-"""Backward-compatible domain imports.
-
-New code should import from browser_agent.domain.
-"""
+"""Domain contracts for the browser testing agent."""
 
 from browser_agent.domain.models import (
     ActionApproval,

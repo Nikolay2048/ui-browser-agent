@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 
-from browser_agent.models import (
+from browser_agent.domain import (
     ApprovalPolicyDecision,
     BrowserAction,
     BrowserActionType,

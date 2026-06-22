@@ -10,7 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from browser_agent.judge_evaluation import JudgeEvaluationCase
+from browser_agent.evaluation.judge import JudgeEvaluationCase
 
 
 DATASET_NAME = "ui-browser-agent-judge-v1"

@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from browser_agent.models import BrowserTargetStrategy, BrowserTarget
+from browser_agent.domain import BrowserTargetStrategy, BrowserTarget
 
 
 class PlaywrightBrowser:

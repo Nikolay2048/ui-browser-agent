@@ -2,7 +2,7 @@
 
 from langchain_core.runnables import RunnableConfig
 
-from browser_agent.models import TestCase
+from browser_agent.domain import TestCase
 
 
 def build_trace_config(test_case: TestCase) -> RunnableConfig:

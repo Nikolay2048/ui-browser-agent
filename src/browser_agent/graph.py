@@ -11,7 +11,7 @@ from browser_agent.approval_policy import make_assess_action_node, route_after_r
 from browser_agent.classifier import make_classifier_node
 from browser_agent.executor import make_execute_node
 from browser_agent.judge import make_judge_node
-from browser_agent.models import BrowserActionType, RunTermination, TerminationKind
+from browser_agent.domain import BrowserActionType, RunTermination, TerminationKind
 from browser_agent.observer import make_observe_node
 from browser_agent.planner import make_plan_node
 from browser_agent.reporter import make_reporter_node

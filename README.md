@@ -13,7 +13,9 @@
 
 ```text
 src/browser_agent/
-├── models.py              # Pydantic-контракты
+├── domain/                # новый public API доменных контрактов
+├── evaluation/            # новый public API offline evaluation
+├── models.py              # временный compatibility path
 ├── state.py               # AgentState
 ├── graph.py               # LangGraph workflow
 ├── runner.py              # composition layer
@@ -29,8 +31,8 @@ src/browser_agent/
 ├── approval_policy.py     # детерминированная risk policy
 ├── persistence.py         # thread config
 ├── observability.py       # LangSmith config
-├── planner_evaluation.py  # component evaluation Planner
-└── judge_evaluation.py    # component evaluation Judge
+├── planner_evaluation.py  # compatibility path
+└── judge_evaluation.py    # compatibility path
 ```
 
 Подробная схема: [docs/architecture.md](docs/architecture.md).
@@ -96,14 +98,18 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 27: [Evaluation Judge](learning/lesson_27_judge_evaluation/README.md).
+Урок 28 завершён: [Production package architecture](learning/lesson_28_package_architecture/README.md).
 
-Нужно:
+Реализовано:
 
-- создать Judge dataset с pass/fail labels;
-- построить confusion matrix;
-- измерить accuracy, precision, recall, FPR и FNR;
-- отдельно отслеживать опасные false positive в LangSmith.
+- `domain` стал source of truth для Pydantic-контрактов;
+- `evaluation` владеет Planner/Judge evaluation;
+- старые import paths сохранены через compatibility shims;
+- production-код и scripts используют новые public API;
+- удалены устаревшие `src/main.py` и `src/graph.png`;
+- identity типов и функций защищена архитектурными тестами.
+
+Следующий этап — end-to-end evaluation полного агента.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.

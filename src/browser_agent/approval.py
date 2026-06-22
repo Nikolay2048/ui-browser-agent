@@ -2,7 +2,7 @@
 
 from langgraph.types import interrupt
 
-from browser_agent.models import ActionApproval, RunTermination, TerminationKind
+from browser_agent.domain import ActionApproval, RunTermination, TerminationKind
 from browser_agent.state import AgentState
 
 

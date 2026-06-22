@@ -4,7 +4,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from browser_agent.graph import build_agent_graph
-from browser_agent.models import TestCase
+from browser_agent.domain import TestCase
 from browser_agent.observability import build_trace_config
 from browser_agent.persistence import build_thread_config
 from browser_agent.reporting import build_run_report, save_run_report

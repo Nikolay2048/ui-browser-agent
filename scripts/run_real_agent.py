@@ -18,7 +18,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from browser_agent.browser import PlaywrightBrowser
-from browser_agent.models import TestCase
+from browser_agent.domain import TestCase
 from browser_agent.runner import run_agent
 
 

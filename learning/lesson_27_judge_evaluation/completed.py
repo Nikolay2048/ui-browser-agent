@@ -1,9 +1,6 @@
-"""Backward-compatible Judge evaluation imports.
+"""Key Judge evaluation contracts completed in lesson 27."""
 
-New code should import from browser_agent.evaluation.judge.
-"""
-
-from browser_agent.evaluation.judge import (
+from browser_agent.judge_evaluation import (
     JudgeEvaluationCase,
     JudgeEvaluationSummary,
     JudgePredictionScore,

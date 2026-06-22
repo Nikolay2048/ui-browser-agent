@@ -4,7 +4,7 @@ The related lesson is archived in learning/lesson_05_planner/README.md.
 """
 from langchain_core.prompts import ChatPromptTemplate
 
-from browser_agent.models import BrowserAction, ExecutionStep
+from browser_agent.domain import BrowserAction, ExecutionStep
 from browser_agent.state import AgentState
 
 SYSTEM_PROMPT = """

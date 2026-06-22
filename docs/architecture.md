@@ -106,19 +106,26 @@ RunReport   -> итоговый пользовательский артефак�
 
 ## Production-направление
 
-По мере роста пакет следует разделить на подпакеты:
+Первая часть миграции уже выполнена:
 
 ```text
 browser_agent/
 ├── domain/
-├── agents/
-├── workflow/
-├── infrastructure/
-├── application/
-├── reporting/
 └── evaluation/
 ```
 
-Миграцию нужно делать по границам ответственности и сопровождать тестами.
-Перенос всех файлов одновременно не даёт пользовательской ценности и создаёт
-ненужный риск изменения импортов.
+Старые пути `browser_agent.models`, `browser_agent.planner_evaluation` и
+`browser_agent.judge_evaluation` временно сохранены как compatibility shims.
+
+Следующие подпакеты будут выделяться только при практической необходимости:
+
+```text
+agents/
+workflow/
+infrastructure/
+application/
+reporting/
+```
+
+Миграция выполняется по одной границе ответственности и сопровождается тестами
+identity и обратной совместимости.

@@ -2,7 +2,7 @@
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from browser_agent.models import JudgeVerdict
+from browser_agent.domain import JudgeVerdict
 from browser_agent.planner import format_execution_history
 from browser_agent.state import AgentState
 

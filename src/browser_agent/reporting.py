@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from browser_agent.models import RunReport
+from browser_agent.domain import RunReport
 from browser_agent.state import AgentState
 from jinja2 import Environment, PackageLoader, StrictUndefined
 

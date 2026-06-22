@@ -3,7 +3,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 
-from browser_agent.models import FailureClassification, TestCase
+from browser_agent.domain import FailureClassification, TestCase
 from browser_agent.planner import format_execution_history
 from browser_agent.state import AgentState
 

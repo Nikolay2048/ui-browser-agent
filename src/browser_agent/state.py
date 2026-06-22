@@ -4,7 +4,7 @@ State contract shared by the current agent graph.
 """
 from typing import TypedDict, NotRequired, Required, Literal
 
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     ActionApproval,
     ApprovalPolicyDecision,

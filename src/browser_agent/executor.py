@@ -3,7 +3,7 @@
 The related lesson is archived in learning/lesson_07_executor/README.md.
 """
 
-from browser_agent.models import (
+from browser_agent.domain import (
     ActionResult,
     BrowserActionType,
     ExecutionStep,
