@@ -45,7 +45,8 @@
 | 26 | Evaluation Planner | `completed.py` |
 | 27 | Evaluation Judge | `completed.py` |
 | 28 | Production package architecture | `completed.py` |
-| 29 | End-to-end evaluation | текущее задание в `evaluation/end_to_end.py` |
+| 29 | End-to-end evaluation | deterministic model, fake browser, полный граф |
+| 30 | Live end-to-end evaluation | текущее задание в `scripts/evaluate_live_end_to_end.py` |
 
 ## Где писать новый код
 
@@ -58,18 +59,14 @@
 src/browser_agent/
 ```
 
-Текущий код урока 29 находится в:
+Текущий код урока 30 находится в:
 
 ```text
-src/browser_agent/evaluation/end_to_end.py
-evaluations/end_to_end_cases.json
+scripts/evaluate_live_end_to_end.py
 ```
 
-Основные тесты задания находятся в:
-
-```text
-tests/test_end_to_end_evaluation.py
-```
+Теория и критерии выполнения находятся в
+`learning/lesson_30_live_end_to_end_evaluation/README.md`.
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.
 Поэтому некоторые из них могут не запускаться напрямую с текущей версией

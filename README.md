@@ -96,14 +96,11 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 29: [End-to-end evaluation](learning/lesson_29_end_to_end_evaluation/README.md).
+Текущий урок 30: [Live end-to-end evaluation](learning/lesson_30_live_end_to_end_evaluation/README.md).
 
-Нужно:
-
-- оценить полный запуск, а не отдельную LLM-роль;
-- измерить status, termination, step budget и recovery;
-- отделить execution harness от scorer-а;
-- подготовить compact LangSmith target полного агента.
+Нужно провести повторяемый эксперимент с настоящими Ollama, Playwright и LangGraph,
+изолировать browser session каждого повтора и измерить стабильность полного агента
+через scorer урока 29.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.
