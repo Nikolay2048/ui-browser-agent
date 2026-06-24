@@ -52,7 +52,8 @@
 | 33 | Human feedback records | `src/browser_agent/feedback.py`, `tests/test_feedback.py` |
 | 34 | Feedback collection CLI | `src/browser_agent/feedback_cli.py`, `tests/test_feedback_cli.py` |
 | 35 | Feedback retrieval | `src/browser_agent/feedback_retrieval.py`, `tests/test_feedback_retrieval.py` |
-| 36 | Planner memory context | текущее задание в `src/browser_agent/planner.py` |
+| 36 | Planner memory context | `src/browser_agent/planner.py`, `tests/test_planner_memory_context.py` |
+| 37 | Runner feedback memory | текущее задание в `src/browser_agent/runner.py` |
 
 ## Где писать новый код
 
@@ -65,16 +66,16 @@
 src/browser_agent/
 ```
 
-Текущий код урока 36 находится в:
+Текущий код урока 37 находится в:
 
 ```text
-src/browser_agent/planner.py
-src/browser_agent/state.py
-tests/test_planner_memory_context.py
+src/browser_agent/runner.py
+scripts/run_real_agent.py
+tests/test_runner_feedback_memory.py
 ```
 
 Теория и критерии выполнения находятся в
-`learning/lesson_36_planner_memory_context/README.md`.
+`learning/lesson_37_runner_feedback_memory/README.md`.
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.
 Поэтому некоторые из них могут не запускаться напрямую с текущей версией

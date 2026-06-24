@@ -5,13 +5,11 @@ import sys
 from pathlib import Path
 from pprint import pprint
 from uuid import uuid4
-from langgraph.checkpoint.memory import InMemorySaver
+
 from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
+from langgraph.checkpoint.memory import InMemorySaver
 from playwright.sync_api import sync_playwright
-
-from browser_agent.graph import build_agent_graph
-from browser_agent.persistence import build_thread_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -19,10 +17,11 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from browser_agent.browser import PlaywrightBrowser
 from browser_agent.domain import TestCase
+from browser_agent.feedback import JsonlFeedbackStore
+from browser_agent.graph import build_agent_graph
+from browser_agent.persistence import build_thread_config
 from browser_agent.run_history import JsonlRunHistoryStore
 from browser_agent.runner import run_agent
-
-
 
 
 def print_state(state: dict) -> None:
@@ -60,6 +59,8 @@ def main() -> None:
     model_name = os.getenv("OLLAMA_MODEL", "qwen3.6:35b")
 
     print(f"model name: {model_name}")
+    print(f"feedback: {feedback_path}")
+
     test_case = TestCase(
         id="first-real-agent",
         name="Create a task using the autonomous agent",
@@ -93,6 +94,8 @@ def main() -> None:
         thread_id = f"{test_case.id}:{uuid4()}"
         history_path = PROJECT_ROOT / "artifacts" / "run-history" / "runs.jsonl"
         history_store = JsonlRunHistoryStore(history_path)
+        feedback_path = PROJECT_ROOT / "artifacts" / "feedback" / "feedback.jsonl"
+        feedback_store = JsonlFeedbackStore(feedback_path)
 
         result = run_agent(
             model=model,
@@ -104,6 +107,7 @@ def main() -> None:
             thread_id=thread_id,
             history_store=history_store,
             run_id=thread_id,
+            feedback_store=feedback_store,
         )
 
         config = build_thread_config(test_case, thread_id)

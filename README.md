@@ -100,11 +100,11 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 36: [Planner memory context](learning/lesson_36_planner_memory_context/README.md).
+Текущий урок 37: [Runner feedback memory](learning/lesson_37_runner_feedback_memory/README.md).
 
-Нужно подготовить planner к использованию feedback memory: добавить optional
-`memory_context`, вставить его в prompt и сохранить обычный режим работы без
-памяти.
+Нужно подключить feedback memory к полному запуску агента: `run_agent()` должен
+опционально принимать feedback store, доставать релевантные подсказки,
+формировать `memory_context` и передавать его в LangGraph state.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.
