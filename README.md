@@ -1,6 +1,6 @@
 # Browser Testing Agent
 
-Учебный проект по разработке агентной системы для автоматического тестирования
+Pet-проект по разработке агентной системы для автоматического тестирования
 веб-сайтов.
 
 Система принимает `TestCase`, управляет браузером через Playwright, сохраняет
@@ -127,13 +127,16 @@ LANGSMITH_TRACING=true
 LANGSMITH_PROJECT=ui-browser-agent-dev
 ```
 
-## Текущий этап
+## Project Status
 
-Текущий урок 37: [Runner feedback memory](learning/lesson_37_runner_feedback_memory/README.md).
+Project status: v0.1 educational demo completed.
 
-Нужно подключить feedback memory к полному запуску агента: `run_agent()` должен
-опционально принимать feedback store, доставать релевантные подсказки,
-формировать `memory_context` и передавать его в LangGraph state.
+The project now contains a working browser-testing AI agent with LangGraph,
+LangChain/Ollama, Playwright, structured reports, run history, human feedback
+memory and deterministic feedback retrieval.
+
+The final knowledge base is in [docs/](docs/README.md). The lesson archive is
+in [learning/](learning/README.md).
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.

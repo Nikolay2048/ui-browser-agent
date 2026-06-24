@@ -53,9 +53,9 @@
 | 34 | Feedback collection CLI | `src/browser_agent/feedback_cli.py`, `tests/test_feedback_cli.py` |
 | 35 | Feedback retrieval | `src/browser_agent/feedback_retrieval.py`, `tests/test_feedback_retrieval.py` |
 | 36 | Planner memory context | `src/browser_agent/planner.py`, `tests/test_planner_memory_context.py` |
-| 37 | Runner feedback memory | текущее задание в `src/browser_agent/runner.py` |
+| 37 | Runner feedback memory | `src/browser_agent/runner.py`, `tests/test_runner_feedback_memory.py` |
 
-## Где писать новый код
+## Где находится текущий код
 
 Архивные файлы нужны для чтения и сравнения. Обычный `pytest` их не запускает,
 а рабочий агент их не импортирует.
@@ -66,16 +66,15 @@
 src/browser_agent/
 ```
 
-Текущий код урока 37 находится в:
+Финальная рабочая реализация находится в:
 
 ```text
-src/browser_agent/runner.py
-scripts/run_real_agent.py
-tests/test_runner_feedback_memory.py
+src/browser_agent/
+scripts/
+tests/
 ```
 
-Теория и критерии выполнения находятся в
-`learning/lesson_37_runner_feedback_memory/README.md`.
+Итоговая база знаний находится в `docs/`.
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.
 Поэтому некоторые из них могут не запускаться напрямую с текущей версией
