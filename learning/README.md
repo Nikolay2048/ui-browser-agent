@@ -47,7 +47,8 @@
 | 28 | Production package architecture | `completed.py` |
 | 29 | End-to-end evaluation | deterministic model, fake browser, полный граф |
 | 30 | Live end-to-end evaluation | Ollama, Playwright, повторные полные запуски |
-| 31 | Долговременная история запусков | текущее задание в `src/browser_agent/run_history.py` |
+| 31 | Долговременная история запусков | `src/browser_agent/run_history.py`, `tests/test_run_history.py` |
+| 32 | Подключение истории к runner | текущее задание в `src/browser_agent/runner.py` |
 
 ## Где писать новый код
 
@@ -60,15 +61,16 @@
 src/browser_agent/
 ```
 
-Текущий код урока 31 находится в:
+Текущий код урока 32 находится в:
 
 ```text
 src/browser_agent/run_history.py
-tests/test_run_history.py
+src/browser_agent/runner.py
+tests/test_runner_history.py
 ```
 
 Теория и критерии выполнения находятся в
-`learning/lesson_31_run_history/README.md`.
+`learning/lesson_32_runner_history_integration/README.md`.
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.
 Поэтому некоторые из них могут не запускаться напрямую с текущей версией

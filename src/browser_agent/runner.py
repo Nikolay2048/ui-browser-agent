@@ -3,11 +3,12 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from browser_agent.graph import build_agent_graph
 from browser_agent.domain import TestCase
+from browser_agent.graph import build_agent_graph
 from browser_agent.observability import build_trace_config
 from browser_agent.persistence import build_thread_config
 from browser_agent.reporting import build_run_report, save_run_report
+from browser_agent.run_history import RunHistoryStore, build_run_history_record
 
 
 def run_agent(
@@ -18,6 +19,8 @@ def run_agent(
         report_dir: str | Path | None = None,
         checkpointer=None,
         thread_id: str | None = None,
+        history_store: RunHistoryStore | None = None,
+        run_id: str | None = None,
 ) -> dict:
     """Open the start URL, stream the graph, and return its final state.
 
@@ -54,8 +57,15 @@ def run_agent(
     if final_state is None:
         raise RuntimeError("Agent graph produced no state")
 
-    if report_dir is not None:
+    report = None
+
+    if report_dir is not None or history_store is not None:
         report = build_run_report(final_state)
+
+    if report_dir is not None:
         save_run_report(report, report_dir)
+
+    if history_store is not None:
+        history_store.append(build_run_history_record(report=report, run_id=run_id))
 
     return final_state

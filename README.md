@@ -26,6 +26,7 @@ src/browser_agent/
 ├── classifier.py          # классификация failed run
 ├── reporter.py            # создание BugReport
 ├── reporting.py           # RunReport, JSON и Markdown
+├── run_history.py         # append-only history of completed runs
 ├── approval.py            # interrupt/resume
 ├── approval_policy.py     # детерминированная risk policy
 ├── persistence.py         # thread config
@@ -96,11 +97,12 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 31: [Долговременная история запусков](learning/lesson_31_run_history/README.md).
+Текущий урок 32: [Подключаем историю запусков к runner](learning/lesson_32_runner_history_integration/README.md).
 
-Нужно реализовать типизированную запись завершённого запуска, append-only
-JSONL-хранилище и запросы истории по `test_case.id`. История пока не передаётся
-planner: сначала сохраняем и проверяем факты, затем строим feedback и retrieval.
+Нужно подключить уже реализованную историю запусков к `run_agent()`: после
+завершения графа runner должен уметь сохранить `RunHistoryRecord` через
+переданное снаружи хранилище. История пока не передаётся planner: сначала
+надежно сохраняем факты завершенных запусков, затем строим feedback и retrieval.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.

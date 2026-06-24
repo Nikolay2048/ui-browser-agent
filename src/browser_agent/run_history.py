@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Protocol
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -17,11 +18,16 @@ class RunHistoryRecord(BaseModel):
     report: RunReport
 
 
+class RunHistoryStore(Protocol):
+    def append(self, record: RunHistoryRecord) -> None:
+        ...
+
+
 def build_run_history_record(
         report: RunReport,
         *,
         run_id: str | None = None,
-    recorded_at: datetime | None = None,
+        recorded_at: datetime | None = None,
 ) -> RunHistoryRecord:
     """Create a history record with injectable identity and time."""
     if run_id is None:
