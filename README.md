@@ -1,80 +1,258 @@
-# Browser Testing Agent
+# UiBrowserAgent
 
-Pet-проект по разработке агентной системы для автоматического тестирования
-веб-сайтов.
+Pet-проект AI-agent для автоматизированного UI-тестирования web-сайтов через
+браузер.
 
-Система принимает `TestCase`, управляет браузером через Playwright, сохраняет
-маршрут выполнения, проверяет ожидаемые результаты, классифицирует сбои и
-формирует отчёт о запуске.
+Этот репозиторий одновременно является рабочим прототипом и архивом обучения.
+Проект собирался по шагам, чтобы изучить, как проектируются агентские системы:
+типизированные контракты, состояние, граф управления, выполнение инструментов,
+оценка качества, наблюдаемость, persistence и память на основе человеческой
+обратной связи.
 
-## Архитектура
+Текущая система принимает `TestCase`, открывает страницу через Playwright,
+наблюдает текущее состояние страницы, просит LLM Planner выбрать следующее
+браузерное действие, выполняет его через детерминированный browser adapter,
+записывает маршрут, проверяет результат независимым Judge, классифицирует сбои и
+формирует структурированный отчет о запуске.
 
-Актуальный код:
+## Статус Проекта
+
+Статус: `v0.1 educational demo completed`.
+
+Уже реализовано:
+
+- browser testing agent на LangGraph;
+- Pydantic-контракты для всех важных данных между компонентами;
+- LangChain structured output для Planner, Judge, Classifier и Reporter;
+- Playwright adapter для действий в настоящем браузере;
+- детерминированный execution trace со скриншотами;
+- ограничение цикла через `max_steps` и `max_failures`;
+- независимый Judge вместо доверия к `finish` от Planner;
+- классификация failed run;
+- генерация структурированного bug report;
+- JSON и Markdown run reports;
+- append-only run history в JSONL;
+- human feedback records в JSONL;
+- deterministic feedback retrieval и planner memory context;
+- LangSmith traces и evaluation experiments;
+- component и end-to-end тесты;
+- архив уроков;
+- проектная документация;
+- Notion-friendly база знаний для будущих проектов.
+
+Что намеренно не завершено на этом этапе:
+
+- production web UI/API;
+- интеграция с реальным bug tracker;
+- генерация Playwright автотестов из маршрутов агента;
+- semantic/vector RAG;
+- поддержка vision model;
+- production deployment и multi-user security.
+
+Это не "дыры" текущего этапа, а логичные темы следующей стадии развития.
+
+## Зачем Нужен Этот Проект
+
+Цель проекта - не просто вызвать LLM из Python. Цель - научиться строить
+агентскую систему, которую можно тестировать, отлаживать, измерять и улучшать.
+
+Главная инженерная идея:
+
+```text
+LLM предлагает намерение.
+Типизированные контракты валидируют его.
+Детерминированные tools выполняют его.
+Граф ограничивает поток управления.
+Judge проверяет результат.
+Persistence объясняет запуск после выполнения.
+Evaluation измеряет качество.
+Human feedback улучшает будущие запуски.
+```
+
+Это ключевой навык AI engineering: превращать вероятностное поведение модели в
+контролируемую программную систему.
+
+## Общий Поток Работы
+
+```mermaid
+flowchart LR
+    TC["TestCase"] --> OBS["Observe page"]
+    OBS --> PLAN["Planner LLM"]
+    PLAN --> ACT["BrowserAction"]
+    ACT --> EXEC["Playwright Executor"]
+    EXEC --> ROUTE["ExecutionStep route"]
+    ROUTE --> OBS
+    PLAN -->|finish| JUDGE["Judge LLM"]
+    JUDGE -->|passed| REPORT["RunReport"]
+    JUDGE -->|failed| CLASSIFY["Failure Classifier"]
+    CLASSIFY --> BUG["Bug Reporter"]
+    CLASSIFY --> REPORT
+    BUG --> REPORT
+    FEEDBACK["Human Feedback JSONL"] --> MEMORY["Feedback Retrieval"]
+    MEMORY --> PLAN
+```
+
+## Структура Репозитория
 
 ```text
 src/browser_agent/
-├── domain/                # public API доменных контрактов
-├── evaluation/            # component и end-to-end evaluation
-├── state.py               # AgentState
-├── graph.py               # LangGraph workflow
-├── runner.py              # composition layer
-├── planner.py             # выбор следующего действия
-├── observer.py            # получение page snapshot
-├── executor.py            # выполнение BrowserAction
-├── browser.py             # Playwright adapter
-├── judge.py               # проверка expected results
+├── domain/                # Pydantic domain contracts
+├── evaluation/            # planner, judge и end-to-end evaluation helpers
+├── state.py               # LangGraph AgentState
+├── graph.py               # основной LangGraph workflow
+├── runner.py              # composition layer для реальных запусков
+├── planner.py             # LLM Planner следующего действия
+├── observer.py            # node получения page snapshot
+├── executor.py            # deterministic action execution node
+├── browser.py             # Playwright browser adapter
+├── judge.py               # независимая проверка результата
 ├── classifier.py          # классификация failed run
-├── reporter.py            # создание BugReport
-├── reporting.py           # RunReport, JSON и Markdown
-├── run_history.py         # append-only history of completed runs
-├── feedback.py            # human feedback records
-├── feedback_cli.py        # CLI helpers for collecting feedback
-├── feedback_retrieval.py  # deterministic retrieval over feedback records
-├── approval.py            # interrupt/resume
-├── approval_policy.py     # детерминированная risk policy
-├── persistence.py         # thread config
-└── observability.py       # LangSmith config
+├── reporter.py            # генерация structured bug report
+├── reporting.py           # сохранение JSON/Markdown RunReport
+├── run_history.py         # append-only run history
+├── feedback.py            # human feedback records и JSONL store
+├── feedback_cli.py        # CLI для добавления feedback
+├── feedback_retrieval.py  # deterministic feedback retrieval
+├── approval.py            # LangGraph interrupt/resume approval
+├── approval_policy.py     # deterministic action risk policy
+├── persistence.py         # checkpoint/thread config helpers
+└── observability.py       # LangSmith trace config
 ```
 
-Подробная схема: [docs/architecture.md](docs/architecture.md).
+Другие важные папки:
 
-## Основные команды
+```text
+scripts/        # demo-запуски, evaluation и upload dataset scripts
+tests/          # regression tests агентской системы
+examples/       # воспроизводимые demo fixtures и feedback examples
+learning/       # архив уроков: теория, задания и выполненные упражнения
+docs/           # проектная документация и архитектурные заметки
+notion_export/  # переносимая база знаний по AI agents для будущих проектов
+artifacts/      # локальные runtime outputs; не коммитить
+```
 
-Установка проекта:
+## Установка
+
+Нужен Python 3.11+.
 
 ```powershell
 python -m pip install -e ".[dev]"
 playwright install chromium
 ```
 
-Unit и integration tests:
+Создай `.env` на основе [.env.example](.env.example):
+
+```text
+OLLAMA_MODEL=qwen3.5:35b
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=replace-with-your-langsmith-key
+LANGSMITH_PROJECT=ui-browser-agent-dev
+```
+
+Модель Ollama можно менять. Для этого проекта важнее не "креативность", а
+стабильное следование инструкциям и надежный structured output.
+
+## Запуск Тестов
 
 ```powershell
 python -m pytest -q
 ```
 
-Реальный автономный агент:
+Тесты покрывают:
+
+- валидацию domain models;
+- prompt и structured output Planner;
+- routing внутри graph;
+- execution trace;
+- Judge;
+- failure classification;
+- bug reporting;
+- approval flow;
+- persistence;
+- run history;
+- feedback memory;
+- deterministic evaluation helpers;
+- runner integration.
+
+## Запуск Агента С Видимым Браузером
 
 ```powershell
 python scripts\run_real_agent.py
 ```
 
-Агент с human approval:
+Этот script:
+
+- открывает `examples/playwright_fixture.html`;
+- запускает видимый Chromium;
+- выполняет LangGraph agent;
+- печатает state graph по шагам;
+- сохраняет screenshots и reports в `artifacts/`;
+- пишет run history в `artifacts/run-history/runs.jsonl`;
+- печатает checkpoint state в конце.
+
+Запуск с committed feedback-memory примером:
+
+```powershell
+python scripts\run_real_agent.py --feedback-path examples\feedback\first-real-agent.feedback.jsonl
+```
+
+## Добавление Human Feedback
+
+Feedback хранится в JSONL. Это не "магическое обучение модели". Это явное
+человеческое знание, которое можно извлечь и добавить в будущий planner prompt.
+
+Пример:
+
+```powershell
+python scripts\add_feedback.py `
+  --run-id "manual-seed" `
+  --test-case-id first-real-agent `
+  --scope planner `
+  --summary "Planner should use a stable locator for the task input." `
+  --correction 'For the task input, prefer label=Task.' `
+  --tags planner,locator
+```
+
+Локальный feedback по умолчанию пишется в:
+
+```text
+artifacts/feedback/feedback.jsonl
+```
+
+Воспроизводимые примеры должны лежать в:
+
+```text
+examples/feedback/
+```
+
+## Запуск С Human Approval
 
 ```powershell
 python scripts\run_agent_with_approval.py
 ```
 
-Локальная evaluation Planner:
+Этот пример показывает LangGraph interrupt/resume:
+
+1. Planner предлагает browser action.
+2. Deterministic policy решает, нужно ли подтверждение.
+3. Graph ставится на паузу через interrupt payload.
+4. Человек подтверждает или отклоняет действие.
+5. Graph возобновляется из checkpoint.
+
+## Evaluation Команды
+
+Локальная component evaluation:
 
 ```powershell
 python scripts\evaluate_planner.py
+python scripts\evaluate_judge.py
+python scripts\evaluate_end_to_end.py
 ```
 
-Локальная evaluation Judge:
+Live browser end-to-end evaluation:
 
 ```powershell
-python scripts\evaluate_judge.py
+python scripts\evaluate_live_end_to_end.py --repeat 3 --slow-mo 100
 ```
 
 LangSmith experiments:
@@ -84,69 +262,106 @@ python scripts\run_planner_experiment.py
 python scripts\run_judge_experiment.py
 ```
 
-## Demo Run
-
-Run the local fixture with visible Chromium:
+Dataset upload helpers:
 
 ```powershell
-python scripts\run_real_agent.py
+python scripts\upload_planner_dataset.py
+python scripts\upload_judge_dataset.py
 ```
 
-Run the same agent with a committed feedback-memory example:
+## Документация
 
-```powershell
-python scripts\run_real_agent.py --feedback-path examples\feedback\first-real-agent.feedback.jsonl
-```
+Начинать лучше отсюда:
 
-Add your own local feedback after a run:
+- [docs/README.md](docs/README.md) - индекс документации.
+- [docs/architecture.md](docs/architecture.md) - текущая архитектура.
+- [docs/langgraph-agent-flow.md](docs/langgraph-agent-flow.md) - подробный flow графа.
+- [docs/concepts-and-decisions.md](docs/concepts-and-decisions.md) - концепции и инженерные решения.
+- [docs/memory-feedback-retrieval.md](docs/memory-feedback-retrieval.md) - persistence, memory и retrieval.
+- [docs/evaluation-observability.md](docs/evaluation-observability.md) - testing, evaluation и LangSmith.
+- [docs/runbook.md](docs/runbook.md) - практический справочник команд.
+- [docs/code-review.md](docs/code-review.md) - senior review и идеи улучшений.
+- [docs/future-study-roadmap.md](docs/future-study-roadmap.md) - следующие темы изучения.
 
-```powershell
-python scripts\add_feedback.py `
-  --run-id "manual-seed" `
-  --test-case-id first-real-agent `
-  --scope planner `
-  --summary "Planner should use stable locator for the task input." `
-  --correction 'For the task input, prefer label=Task.' `
-  --tags planner,locator
-```
+Архив обучения:
 
-Local runtime files are written to `artifacts/` and should not be committed.
-Reusable demo inputs belong in `examples/`.
+- [learning/README.md](learning/README.md) - уроки, по которым строилась система.
 
-## Конфигурация
+Переносимые заметки для будущих проектов:
 
-Локальные значения хранятся в `.env`, который не добавляется в Git.
-Поддерживаемые переменные приведены в [.env.example](.env.example).
+- [notion_export/00_index.md](notion_export/00_index.md) - Notion-friendly knowledge base.
 
-Минимальный набор:
+## Главные Архитектурные Уроки
 
-```text
-OLLAMA_MODEL=qwen3.5:35b
-LANGSMITH_API_KEY=...
-LANGSMITH_TRACING=true
-LANGSMITH_PROJECT=ui-browser-agent-dev
-```
+### 1. Не Давать LLM Выполнять Side Effects
 
-## Project Status
+LLM возвращает типизированный `BrowserAction`. Executor - обычный Python-код,
+который решает, как вызвать Playwright. Так поведение можно тестировать,
+логировать и отлаживать.
 
-Project status: v0.1 educational demo completed.
+### 2. Контракты Важнее Prompt
 
-The project now contains a working browser-testing AI agent with LangGraph,
-LangChain/Ollama, Playwright, structured reports, run history, human feedback
-memory and deterministic feedback retrieval.
+Самые важные файлы - не prompts. Самые важные файлы - контракты данных в
+`src/browser_agent/domain/models.py`. Prompt становится безопаснее, когда модель
+обязана вернуть объект строгой схемы.
 
-The final knowledge base is in [docs/](docs/README.md). The lesson archive is
-in [learning/](learning/README.md).
+### 3. Разделять Planner И Judge
 
-Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
-файлы не импортируются рабочим приложением и не входят в основной `pytest`.
+Planner выбирает следующее действие. Judge независимо проверяет, выполнены ли
+ожидаемые результаты. `finish` от Planner не считается доказательством успеха.
 
-## Стек
+### 4. Считать Memory Данными
 
-- Pydantic — контракты данных;
-- LangChain — prompt, LLM и structured output;
-- LangGraph — состояние, переходы и цикл;
-- Playwright — управление настоящим браузером;
-- Ollama `qwen3.5:35b` — локальная модель;
-- LangSmith — traces, datasets и evaluation experiments;
-- Jinja2 — Markdown-шаблон итогового отчёта.
+Human feedback хранится как структурированные записи, извлекается
+детерминированно и форматируется в planner prompt. Это сопровождаемее, чем
+бесконечно править один большой prompt после каждой ошибки.
+
+### 5. Оценивать Компоненты Отдельно
+
+Ошибки агента проще отлаживать, когда Planner, Judge, retrieval и complete run
+можно измерить отдельно.
+
+## Текущие Ограничения
+
+- Основной demo-сценарий основан на локальном Playwright fixture.
+- Наблюдение страницы использует accessibility snapshot, а не анализ screenshots
+  через vision model.
+- Feedback retrieval сейчас deterministic keyword/metadata style, а не vector
+  RAG.
+- Генерация Playwright tests из route пока не реализована.
+- Approval показан через отдельный script, но не встроен в default `run_agent()`
+  helper.
+- Storage основан на JSONL/files. Это удобно для обучения, но недостаточно для
+  production multi-user service.
+
+## Рекомендуемые Следующие Улучшения
+
+Самые полезные следующие шаги:
+
+1. Генерировать Playwright test drafts из успешных route.
+2. Добавить route normalization перед code generation.
+3. Добавить semantic или hybrid retrieval по feedback и успешным маршрутам.
+4. Сохранять `used_memory_ids` в reports.
+5. Добавить больше live end-to-end scenarios.
+6. Добавить prompt versioning.
+7. Заменить JSONL persistence на database-backed adapters.
+8. Сделать небольшой review UI для route, screenshots, verdict и feedback.
+
+## Заметка Ментора
+
+Этот проект полезен тем, что показывает разницу между "LLM demo" и "agentic
+software system".
+
+Когда будешь переносить эти идеи в новый проект, начинай с вопросов:
+
+1. Какой типизированный вход?
+2. Какое состояние у одного запуска?
+3. Какие решения действительно требуют LLM?
+4. Какие действия должны быть deterministic tools?
+5. Кто проверяет результат?
+6. Что сохраняется для отладки?
+7. Как будет измеряться качество?
+8. Как человеческие исправления будут улучшать будущие запуски?
+
+Если ты можешь ответить на эти вопросы до кода, ты проектируешь агента как
+инженер, а не надеешься, что один большой prompt удержит всю систему.
