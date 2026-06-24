@@ -96,11 +96,11 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 30: [Live end-to-end evaluation](learning/lesson_30_live_end_to_end_evaluation/README.md).
+Текущий урок 31: [Долговременная история запусков](learning/lesson_31_run_history/README.md).
 
-Нужно провести повторяемый эксперимент с настоящими Ollama, Playwright и LangGraph,
-изолировать browser session каждого повтора и измерить стабильность полного агента
-через scorer урока 29.
+Нужно реализовать типизированную запись завершённого запуска, append-only
+JSONL-хранилище и запросы истории по `test_case.id`. История пока не передаётся
+planner: сначала сохраняем и проверяем факты, затем строим feedback и retrieval.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.
