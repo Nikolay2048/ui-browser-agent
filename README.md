@@ -84,6 +84,35 @@ python scripts\run_planner_experiment.py
 python scripts\run_judge_experiment.py
 ```
 
+## Demo Run
+
+Run the local fixture with visible Chromium:
+
+```powershell
+python scripts\run_real_agent.py
+```
+
+Run the same agent with a committed feedback-memory example:
+
+```powershell
+python scripts\run_real_agent.py --feedback-path examples\feedback\first-real-agent.feedback.jsonl
+```
+
+Add your own local feedback after a run:
+
+```powershell
+python scripts\add_feedback.py `
+  --run-id "manual-seed" `
+  --test-case-id first-real-agent `
+  --scope planner `
+  --summary "Planner should use stable locator for the task input." `
+  --correction 'For the task input, prefer label=Task.' `
+  --tags planner,locator
+```
+
+Local runtime files are written to `artifacts/` and should not be committed.
+Reusable demo inputs belong in `examples/`.
+
 ## Конфигурация
 
 Локальные значения хранятся в `.env`, который не добавляется в Git.
