@@ -100,11 +100,11 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 35: [Feedback retrieval](learning/lesson_35_feedback_retrieval/README.md).
+Текущий урок 36: [Planner memory context](learning/lesson_36_planner_memory_context/README.md).
 
-Нужно реализовать deterministic retrieval для человеческой обратной связи:
-фильтрацию по `test_case.id`, scope, tags, сортировку от новых записей к старым
-и форматирование найденных подсказок для будущего planner prompt.
+Нужно подготовить planner к использованию feedback memory: добавить optional
+`memory_context`, вставить его в prompt и сохранить обычный режим работы без
+памяти.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.

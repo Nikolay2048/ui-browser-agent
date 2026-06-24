@@ -35,3 +35,4 @@ class AgentState(TypedDict):
     bug_report: NotRequired[BugReport]
     action_approval: NotRequired[ActionApproval]
     approval_policy_decision: NotRequired[ApprovalPolicyDecision]
+    memory_context: NotRequired[str]

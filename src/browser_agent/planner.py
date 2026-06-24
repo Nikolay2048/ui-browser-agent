@@ -76,7 +76,23 @@ snapshot, return finish immediately.
 
 Do not use assert_text to re-check a result that is already clearly visible.
 The Judge will validate expected results after finish.
+
+Use previous human feedback when it is relevant to the current goal and page.
+Do not follow feedback that contradicts the current page snapshot.
 """.strip()
+
+
+def format_memory_context(memory_context: str | None) -> str:
+    """Format retrieved human feedback for planner prompt."""
+    if memory_context is None:
+        return "No previous human feedback is available."
+
+    memory_context = memory_context.strip()
+
+    if not memory_context:
+        return "No previous human feedback is available."
+
+    return memory_context
 
 
 def format_execution_history(route: list[ExecutionStep]) -> str:
@@ -120,6 +136,9 @@ def build_planner_prompt() -> ChatPromptTemplate:
             
             Expected results:
             {expected}
+            
+            Previous human feedback:
+            {memory_context}
 
             Execution history:
             {execution_history}
@@ -139,8 +158,14 @@ def build_planner_chain(model):
     return prompt | structured_model
 
 
-def plan_next_action(model, test_case, page_snapshot, route=None):
-    """ invoke the planner chain and return BrowserAction."""
+def plan_next_action(
+        model,
+        test_case,
+        page_snapshot,
+        route=None,
+        memory_context: str | None = None,
+):
+    """Invoke the planner chain and return BrowserAction."""
     chain = build_planner_chain(model)
     execution_history = format_execution_history(route or [])
 
@@ -148,6 +173,7 @@ def plan_next_action(model, test_case, page_snapshot, route=None):
         "goal": test_case.goal,
         "test_data": test_case.test_data,
         "expected": test_case.expected,
+        "memory_context": format_memory_context(memory_context),
         "execution_history": execution_history,
         "page_snapshot": page_snapshot,
     })
@@ -161,7 +187,8 @@ def make_plan_node(model):
             model=model,
             test_case=state["test_case"],
             page_snapshot=state["page_snapshot"],
-            route=state["route"]
+            route=state["route"],
+            memory_context=state.get("memory_context"),
         )
         return {"proposed_action": action}
 
