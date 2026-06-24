@@ -29,6 +29,7 @@ src/browser_agent/
 ├── run_history.py         # append-only history of completed runs
 ├── feedback.py            # human feedback records
 ├── feedback_cli.py        # CLI helpers for collecting feedback
+├── feedback_retrieval.py  # deterministic retrieval over feedback records
 ├── approval.py            # interrupt/resume
 ├── approval_policy.py     # детерминированная risk policy
 ├── persistence.py         # thread config
@@ -99,12 +100,11 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 34: [Feedback collection CLI](learning/lesson_34_feedback_collection_cli/README.md).
+Текущий урок 35: [Feedback retrieval](learning/lesson_35_feedback_retrieval/README.md).
 
-Нужно сделать удобную CLI-команду для добавления человеческой обратной связи в
-`artifacts/feedback/feedback.jsonl`. Feedback пока не передаётся planner:
-сначала учимся удобно собирать коррекции, затем построим retrieval и подключим
-их к prompt.
+Нужно реализовать deterministic retrieval для человеческой обратной связи:
+фильтрацию по `test_case.id`, scope, tags, сортировку от новых записей к старым
+и форматирование найденных подсказок для будущего planner prompt.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.

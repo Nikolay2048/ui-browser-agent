@@ -50,7 +50,8 @@
 | 31 | Долговременная история запусков | `src/browser_agent/run_history.py`, `tests/test_run_history.py` |
 | 32 | Подключение истории к runner | `src/browser_agent/runner.py`, `tests/test_runner_history.py` |
 | 33 | Human feedback records | `src/browser_agent/feedback.py`, `tests/test_feedback.py` |
-| 34 | Feedback collection CLI | текущее задание в `src/browser_agent/feedback_cli.py` |
+| 34 | Feedback collection CLI | `src/browser_agent/feedback_cli.py`, `tests/test_feedback_cli.py` |
+| 35 | Feedback retrieval | текущее задание в `src/browser_agent/feedback_retrieval.py` |
 
 ## Где писать новый код
 
@@ -63,16 +64,15 @@
 src/browser_agent/
 ```
 
-Текущий код урока 34 находится в:
+Текущий код урока 35 находится в:
 
 ```text
-src/browser_agent/feedback_cli.py
-scripts/add_feedback.py
-tests/test_feedback_cli.py
+src/browser_agent/feedback_retrieval.py
+tests/test_feedback_retrieval.py
 ```
 
 Теория и критерии выполнения находятся в
-`learning/lesson_34_feedback_collection_cli/README.md`.
+`learning/lesson_35_feedback_retrieval/README.md`.
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.
 Поэтому некоторые из них могут не запускаться напрямую с текущей версией
