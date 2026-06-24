@@ -1,6 +1,7 @@
 """Human feedback memory for completed agent runs."""
 from datetime import datetime, timezone
 from enum import StrEnum
+from pathlib import Path
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, model_validator
@@ -26,9 +27,9 @@ class HumanFeedbackRecord(BaseModel):
     tags: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_verdict(self):
+    def validate_step_scope(self) -> "HumanFeedbackRecord":
         if self.scope == FeedbackScope.STEP and self.step_number is None:
-            raise ValueError("score=step require step_number")
+            raise ValueError("scope=step requires step_number")
         if self.scope != FeedbackScope.STEP and self.step_number is not None:
             raise ValueError("step_number is only allowed when scope is STEP")
         return self
@@ -66,12 +67,6 @@ def build_human_feedback_record(
         correction=correction,
         tags=tags,
     )
-
-
-from pathlib import Path
-
-from browser_agent.feedback import HumanFeedbackRecord
-
 
 class JsonlFeedbackStore:
     """Persist human feedback records as one JSON object per line."""

@@ -49,7 +49,8 @@
 | 30 | Live end-to-end evaluation | Ollama, Playwright, повторные полные запуски |
 | 31 | Долговременная история запусков | `src/browser_agent/run_history.py`, `tests/test_run_history.py` |
 | 32 | Подключение истории к runner | `src/browser_agent/runner.py`, `tests/test_runner_history.py` |
-| 33 | Human feedback records | текущее задание в `src/browser_agent/feedback.py` |
+| 33 | Human feedback records | `src/browser_agent/feedback.py`, `tests/test_feedback.py` |
+| 34 | Feedback collection CLI | текущее задание в `src/browser_agent/feedback_cli.py` |
 
 ## Где писать новый код
 
@@ -62,15 +63,16 @@
 src/browser_agent/
 ```
 
-Текущий код урока 33 находится в:
+Текущий код урока 34 находится в:
 
 ```text
-src/browser_agent/feedback.py
-tests/test_feedback.py
+src/browser_agent/feedback_cli.py
+scripts/add_feedback.py
+tests/test_feedback_cli.py
 ```
 
 Теория и критерии выполнения находятся в
-`learning/lesson_33_human_feedback_records/README.md`.
+`learning/lesson_34_feedback_collection_cli/README.md`.
 
 Старые примеры отражают структуру проекта на соответствующем этапе обучения.
 Поэтому некоторые из них могут не запускаться напрямую с текущей версией

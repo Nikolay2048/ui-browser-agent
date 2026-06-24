@@ -28,6 +28,7 @@ src/browser_agent/
 ├── reporting.py           # RunReport, JSON и Markdown
 ├── run_history.py         # append-only history of completed runs
 ├── feedback.py            # human feedback records
+├── feedback_cli.py        # CLI helpers for collecting feedback
 ├── approval.py            # interrupt/resume
 ├── approval_policy.py     # детерминированная risk policy
 ├── persistence.py         # thread config
@@ -98,12 +99,12 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 33: [Human feedback records](learning/lesson_33_human_feedback_records/README.md).
+Текущий урок 34: [Feedback collection CLI](learning/lesson_34_feedback_collection_cli/README.md).
 
-Нужно реализовать структурированную человеческую обратную связь по завершенным
-запускам: `HumanFeedbackRecord`, builder-функцию и append-only JSONL-хранилище.
-Feedback пока не передаётся planner: сначала сохраняем коррекции как данные,
-затем построим retrieval и подключим их к prompt.
+Нужно сделать удобную CLI-команду для добавления человеческой обратной связи в
+`artifacts/feedback/feedback.jsonl`. Feedback пока не передаётся planner:
+сначала учимся удобно собирать коррекции, затем построим retrieval и подключим
+их к prompt.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.
