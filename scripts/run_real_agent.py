@@ -19,6 +19,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from browser_agent.browser import PlaywrightBrowser
 from browser_agent.domain import TestCase
+from browser_agent.run_history import JsonlRunHistoryStore
 from browser_agent.runner import run_agent
 
 
@@ -90,6 +91,8 @@ def main() -> None:
         )
         checkpointer = InMemorySaver()
         thread_id = f"{test_case.id}:{uuid4()}"
+        history_path = PROJECT_ROOT / "artifacts" / "run-history" / "runs.jsonl"
+        history_store = JsonlRunHistoryStore(history_path)
 
         result = run_agent(
             model=model,
@@ -99,6 +102,8 @@ def main() -> None:
             report_dir=PROJECT_ROOT / "artifacts" / test_case.id / "report",
             checkpointer=checkpointer,
             thread_id=thread_id,
+            history_store=history_store,
+            run_id=thread_id,
         )
 
         config = build_thread_config(test_case, thread_id)
@@ -121,6 +126,7 @@ def main() -> None:
         print(f"steps: {result['step_count']}")
         print(f"failures: {result['failure_count']}")
         print(f"termination: {result['termination'].kind}")
+        print(f"history: {history_path}")
         if classification := result.get("classification"):
             print(f"classification: {classification.category}")
             print(f"confidence: {classification.confidence}")

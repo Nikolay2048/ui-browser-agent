@@ -27,6 +27,7 @@ src/browser_agent/
 ├── reporter.py            # создание BugReport
 ├── reporting.py           # RunReport, JSON и Markdown
 ├── run_history.py         # append-only history of completed runs
+├── feedback.py            # human feedback records
 ├── approval.py            # interrupt/resume
 ├── approval_policy.py     # детерминированная risk policy
 ├── persistence.py         # thread config
@@ -97,12 +98,12 @@ LANGSMITH_PROJECT=ui-browser-agent-dev
 
 ## Текущий этап
 
-Текущий урок 32: [Подключаем историю запусков к runner](learning/lesson_32_runner_history_integration/README.md).
+Текущий урок 33: [Human feedback records](learning/lesson_33_human_feedback_records/README.md).
 
-Нужно подключить уже реализованную историю запусков к `run_agent()`: после
-завершения графа runner должен уметь сохранить `RunHistoryRecord` через
-переданное снаружи хранилище. История пока не передаётся planner: сначала
-надежно сохраняем факты завершенных запусков, затем строим feedback и retrieval.
+Нужно реализовать структурированную человеческую обратную связь по завершенным
+запускам: `HumanFeedbackRecord`, builder-функцию и append-only JSONL-хранилище.
+Feedback пока не передаётся planner: сначала сохраняем коррекции как данные,
+затем построим retrieval и подключим их к prompt.
 
 Завершённые учебные этапы находятся в [learning/](learning/README.md). Архивные
 файлы не импортируются рабочим приложением и не входят в основной `pytest`.
